@@ -100,6 +100,7 @@ export async function POST(request: NextRequest) {
       closesAt,
       targetResponseRate,
       reminderIntervalHours,
+      customQuestions,
     } = parsed.data;
 
     const group = await prisma.group.findUnique({
@@ -129,6 +130,7 @@ export async function POST(request: NextRequest) {
         targetResponseRate,
         reminderIntervalHours,
         status,
+        customQuestionsJson: JSON.stringify(customQuestions ?? []),
         invites: {
           create: group.students.map((st) => ({
             studentId: st.id,

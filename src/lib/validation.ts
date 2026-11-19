@@ -5,6 +5,12 @@ export const loginSchema = z.object({
   password: z.string().min(4, "Password is required"),
 });
 
+export const customQuestionSchema = z.object({
+  id: z.string().trim().min(1).max(40),
+  label: z.string().trim().min(3).max(200),
+  type: z.enum(["RATING", "TEXT"]),
+});
+
 export const createSurveySchema = z.object({
   title: z.string().trim().min(3, "Title must be at least 3 characters").max(140),
   groupId: z.string().trim().min(1, "Group is required"),
@@ -12,6 +18,7 @@ export const createSurveySchema = z.object({
   closesAt: z.string().optional(),
   targetResponseRate: z.coerce.number().int().min(10).max(100).default(75),
   reminderIntervalHours: z.coerce.number().int().min(1).max(168).default(24),
+  customQuestions: z.array(customQuestionSchema).max(10).optional().default([]),
 });
 
 export const updateSurveySchema = z.object({
@@ -24,6 +31,7 @@ export const submitResponseSchema = z.object({
   materialsScore: z.coerce.number().int().min(1).max(5),
   organizationScore: z.coerce.number().int().min(1).max(5),
   comment: z.string().max(2000).optional().default(""),
+  customAnswers: z.record(z.string(), z.union([z.string(), z.number()])).optional().default({}),
 });
 
 export const createIssueSchema = z.object({

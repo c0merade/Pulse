@@ -78,6 +78,7 @@ export async function POST(
       materialsScore,
       organizationScore,
       comment,
+      customAnswers,
     } = parsed.data;
 
     const invite = await prisma.surveyInvite.findUnique({
@@ -112,6 +113,7 @@ export async function POST(
           materialsScore,
           organizationScore,
           comment: comment.trim(),
+          customAnswersJson: JSON.stringify(customAnswers ?? {}),
         },
       }),
       prisma.surveyInvite.update({

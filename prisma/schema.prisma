@@ -63,6 +63,7 @@ model Survey {
   targetResponseRate    Int      @default(75) // percentage 1-100
   reminderIntervalHours Int      @default(24)
   status                String   @default("ACTIVE") // SCHEDULED | ACTIVE | CLOSED
+  customQuestionsJson   String   @default("[]") // JSON array of CustomQuestion
   createdAt             DateTime @default(now())
 
   invites        SurveyInvite[]
@@ -96,6 +97,7 @@ model Response {
   materialsScore    Int      // 1-5
   organizationScore Int      // 1-5
   comment           String   @default("")
+  customAnswersJson String   @default("{}") // JSON map of questionId -> answer
   submittedAt       DateTime @default(now())
 }
 
