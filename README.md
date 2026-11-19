@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pulse — Picsart Academy Quality OS
 
-## Getting Started
+Production-ready quality survey, AI comment clustering, trend analysis, and verified issue tracking platform built for **Picsart Academy**.
 
-First, run the development server:
+## Key Capabilities
+- **Role-Based Access Control (`/login`)**: Signed `HTTP-only` sessions with `scrypt` password hashing for **Director**, **Edu Lead**, **Admin Lead**, and **Lecturer** (lecturers automatically see only their own cohorts).
+- **Survey Scheduling & Automated Reminders (`/surveys`)**: Recurring survey waves with target response rates, reminder cadences, and automatic stop once target turnout is met.
+- **Anonymous Student Survey Form (`/s/[token]`)**: Passwordless unique invite links track *who* responded (to stop reminders) while storing ratings and comments anonymously, protected by rate limiting and Zod validation.
+- **AI Theme Extraction & Summarization (`/surveys/[id]`)**: Clusters student comments into themes with mention counts, sentiment, severity, and quotes using **Gemini (`gemini-3.8-flash` / `gemini-3.8-flash-lite`)** with an automatic **Smart Fallback Analyzer**.
+- **Trend Analysis & Automatic Drop Flags (`/`, `/surveys/[id]`)**: Compares each wave against the previous wave for the same cohort, flags drops `>= 0.4` points, and optionally dispatches **Slack** leadership alerts.
+- **Issue Tracker & Next-Wave Verification (`/issues`)**: Turn AI themes into owned issues (`Edu Lead`, `Admin Lead`, `Director`) with due dates, overdue flags, and `VERIFIED` status linked to follow-up survey waves.
+- **Fair Group & Lecturer Comparison (`/compare`)**: Displays sample size (`n`), turnout `%`, trend momentum, and **Low Sample** fairness guardrails (`n < 5` or `< 50%` turnout).
+- **Academy Cohort Management & Platform Sync API (`/groups`)**: Full CRUD for groups & students, **Bulk CSV Import**, and idempotent REST sync endpoints (`/api/v1/sync/groups`, `/api/v1/sync/students`) secured by `x-api-key`.
+- **Leadership Meeting Brief & Audit Log (`/reports`, `/audit`)**: One-click **Print/PDF**, **Markdown (`.md`)**, and **CSV** exports for leadership syncs, plus an immutable audit trail.
+- **Automated Cron & Healthcheck (`/api/cron/run`, `/api/health`)**: Protected cron cycle that transitions survey statuses, sends Resend/simulated email reminders, runs Auto-AI analysis, and notifies Slack on score drops.
+
+## Quick Start (Local)
 
 ```bash
+npm install
+cp .env.example .env
+npx prisma db push
+npm run db:seed
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Demo Accounts (Password: `pulse123`)
+| Role | Email | Scope |
+|---|---|---|
+| Director | `director@picsart.academy` | Full Academy access |
+| Edu Lead | `edu@picsart.academy` | Full Academy access |
+| Admin Lead | `admin@picsart.academy` | Full Academy access |
+| Lecturer | `ani.h@picsart.academy` | Own cohort only (`Frontend-24`) |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Testing & Production Build
+```bash
+npm test       # Run Vitest suite
+npm run build  # Production Next.js build
+```
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Docker Deployment
+```bash
+docker compose up --build -d
+```
+Healthcheck endpoint: `GET /api/health`.
