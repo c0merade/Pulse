@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Activity,
   BarChart3,
   CheckSquare,
   ClipboardList,
@@ -19,6 +18,7 @@ import {
 } from "lucide-react";
 import type { SessionUser } from "@/lib/auth";
 import { DICT, Lang, LANG_COOKIE_NAME, normalizeLang } from "@/lib/i18n";
+import { PulseLogo } from "./PulseLogo";
 
 export function AppShell({
   children,
@@ -93,9 +93,7 @@ export function AppShell({
         {/* Brand Header */}
         <div className="px-5 py-5 border-b border-[var(--border)] flex items-center justify-between gap-2">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#00e5cc] text-slate-950 flex items-center justify-center shadow-[0_0_20px_rgba(0,229,204,0.35)]">
-              <Activity className="w-5 h-5 stroke-[2.5]" />
-            </div>
+            <PulseLogo className="w-10 h-10 shrink-0 drop-shadow-[0_0_12px_rgba(85,255,240,0.28)]" />
             <div>
               <div className="font-extrabold text-lg leading-tight tracking-tight text-primary">
                 Pulse

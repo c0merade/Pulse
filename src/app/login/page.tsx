@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Activity, ArrowRight, Lock, Moon, ShieldCheck, Sun, Zap } from "lucide-react";
+import { ArrowRight, Lock, Moon, ShieldCheck, Sun, Zap } from "lucide-react";
 import { DICT, Lang, LANG_COOKIE_NAME, normalizeLang } from "@/lib/i18n";
+import { PulseLogo } from "@/components/PulseLogo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -84,9 +85,7 @@ export default function LoginPage() {
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-[#00e5cc] text-slate-950 flex items-center justify-center shadow-[0_0_24px_rgba(0,229,204,0.4)]">
-                  <Activity className="w-6 h-6 stroke-[2.5]" />
-                </div>
+                <PulseLogo className="w-11 h-11 shrink-0 drop-shadow-[0_0_16px_rgba(85,255,240,0.32)]" />
                 <div>
                   <div className="font-extrabold text-xl leading-tight tracking-tight">
                     Pulse

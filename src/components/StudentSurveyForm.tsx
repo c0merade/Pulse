@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Activity, CheckCircle2, Lock } from "lucide-react";
+import { CheckCircle2, Lock } from "lucide-react";
 import { CustomQuestion, DICT, Lang } from "@/lib/i18n";
+import { PulseLogo } from "./PulseLogo";
 
 interface Props {
   token: string;
@@ -88,7 +89,7 @@ export function StudentSurveyForm({
         <div className="bg-[#111418] text-white px-6 py-6 flex items-start justify-between gap-3 border-b border-white/[0.08]">
           <div>
             <div className="flex items-center gap-2 text-[#ffe600] text-xs font-extrabold uppercase tracking-wider mb-1.5">
-              <Activity className="w-4 h-4 text-[#00f0d8]" />
+              <PulseLogo className="w-5 h-5 shrink-0" />
               {t.badge}
             </div>
             <h1 className="text-2xl font-extrabold">{survey.title}</h1>
