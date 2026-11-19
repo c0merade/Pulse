@@ -102,7 +102,7 @@ export default function LoginPage() {
                     type="button"
                     onClick={() => switchLang("hy")}
                     className={`px-2.5 py-1 rounded-lg cursor-pointer ${
-                      lang === "hy" ? "bg-[#00e5cc] text-slate-950" : "text-slate-300"
+                      lang === "hy" ? "bg-[#e000df] text-white" : "text-slate-300"
                     }`}
                   >
                     ՀԱՅ
@@ -111,7 +111,7 @@ export default function LoginPage() {
                     type="button"
                     onClick={() => switchLang("en")}
                     className={`px-2.5 py-1 rounded-lg cursor-pointer ${
-                      lang === "en" ? "bg-[#00e5cc] text-slate-950" : "text-slate-300"
+                      lang === "en" ? "bg-[#e000df] text-white" : "text-slate-300"
                     }`}
                   >
                     ENG
@@ -217,7 +217,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-xl bg-[#00e5cc] hover:bg-[#00d4bd] text-slate-950 text-sm font-extrabold disabled:opacity-60 transition-all shadow-[0_0_20px_rgba(0,229,204,0.28)] flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-3 rounded-xl bg-[#e000df] hover:bg-[#c400c3] text-white text-sm font-extrabold disabled:opacity-60 transition-all shadow-[0_0_22px_rgba(224,0,223,0.34)] flex items-center justify-center gap-2 cursor-pointer"
             >
               {loading ? t.login.submitting : t.login.submit}
               <ArrowRight className="w-4 h-4 stroke-[2.5]" />

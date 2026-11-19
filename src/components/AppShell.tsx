@@ -123,7 +123,7 @@ export function AppShell({
               onClick={() => switchLang("hy")}
               className={`py-1.5 rounded-lg cursor-pointer transition-all ${
                 lang === "hy"
-                  ? "bg-[#00e5cc] text-slate-950 shadow-xs"
+                  ? "bg-[#e000df] text-white shadow-xs"
                   : "text-muted hover:text-primary"
               }`}
             >
@@ -134,7 +134,7 @@ export function AppShell({
               onClick={() => switchLang("en")}
               className={`py-1.5 rounded-lg cursor-pointer transition-all ${
                 lang === "en"
-                  ? "bg-[#00e5cc] text-slate-950 shadow-xs"
+                  ? "bg-[#e000df] text-white shadow-xs"
                   : "text-muted hover:text-primary"
               }`}
             >

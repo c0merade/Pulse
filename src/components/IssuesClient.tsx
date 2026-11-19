@@ -106,7 +106,7 @@ export function IssuesClient({
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#00e5cc] hover:bg-[#00d4bd] text-slate-950 text-sm font-extrabold shadow-[0_0_20px_rgba(0,229,204,0.28)] cursor-pointer self-start"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#e000df] hover:bg-[#c400c3] text-white text-sm font-extrabold shadow-[0_0_22px_rgba(224,0,223,0.34)] cursor-pointer self-start"
         >
           <Plus className="w-4 h-4 stroke-[2.5]" />
           {t.issues.newIssue}
@@ -125,7 +125,7 @@ export function IssuesClient({
               onClick={() => setStatusFilter(st)}
               className={`px-3 py-1.5 rounded-lg font-extrabold transition-all cursor-pointer ${
                 statusFilter === st
-                  ? "bg-[#00e5cc] text-slate-950"
+                  ? "bg-[#e000df] text-white"
                   : "bg-slate-100 dark:bg-white/[0.06] text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/[0.1]"
               }`}
             >
@@ -383,7 +383,7 @@ export function IssuesClient({
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-4 py-2 rounded-xl bg-[#00e5cc] hover:bg-[#00d4bd] text-slate-950 text-sm font-extrabold disabled:opacity-60 cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-[#e000df] hover:bg-[#c400c3] text-white text-sm font-extrabold disabled:opacity-60 cursor-pointer"
                 >
                   {saving ? t.issues.creating : t.issues.create}
                 </button>

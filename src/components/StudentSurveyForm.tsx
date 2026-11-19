@@ -102,7 +102,7 @@ export function StudentSurveyForm({
               type="button"
               onClick={() => setLang("hy")}
               className={`px-2.5 py-1 rounded-lg cursor-pointer ${
-                lang === "hy" ? "bg-[#00e5cc] text-slate-950" : "text-slate-300"
+                lang === "hy" ? "bg-[#e000df] text-white" : "text-slate-300"
               }`}
             >
               ՀԱՅ
@@ -111,7 +111,7 @@ export function StudentSurveyForm({
               type="button"
               onClick={() => setLang("en")}
               className={`px-2.5 py-1 rounded-lg cursor-pointer ${
-                lang === "en" ? "bg-[#00e5cc] text-slate-950" : "text-slate-300"
+                lang === "en" ? "bg-[#e000df] text-white" : "text-slate-300"
               }`}
             >
               ENG
@@ -173,8 +173,8 @@ export function StudentSurveyForm({
                             onClick={() => setScores({ ...scores, [q.key]: val })}
                             className={`py-2.5 rounded-xl border text-sm font-extrabold transition-all cursor-pointer ${
                               selected
-                                ? "bg-[#00e5cc] border-[#00e5cc] text-slate-950 shadow-[0_0_16px_rgba(0,229,204,0.35)]"
-                                : "bg-slate-50 dark:bg-[#1e2229] border-slate-200 dark:border-white/[0.1] text-slate-700 dark:text-slate-200 hover:border-[#00e5cc]"
+                                ? "bg-[#e000df] border-[#e000df] text-white shadow-[0_0_18px_rgba(224,0,223,0.4)]"
+                                : "bg-slate-50 dark:bg-[#1e2229] border-slate-200 dark:border-white/[0.1] text-slate-700 dark:text-slate-200 hover:border-[#e000df]"
                             }`}
                           >
                             {val}
@@ -254,7 +254,7 @@ export function StudentSurveyForm({
               <button
                 type="submit"
                 disabled={submitting || !isComplete}
-                className="w-full py-3.5 rounded-xl bg-[#00e5cc] hover:bg-[#00d4bd] text-slate-950 text-sm font-extrabold disabled:opacity-50 transition-all shadow-[0_0_20px_rgba(0,229,204,0.28)] cursor-pointer"
+                className="w-full py-3.5 rounded-xl bg-[#e000df] hover:bg-[#c400c3] text-white text-sm font-extrabold disabled:opacity-50 transition-all shadow-[0_0_22px_rgba(224,0,223,0.34)] cursor-pointer"
               >
                 {submitting ? t.submitting : t.submit}
               </button>

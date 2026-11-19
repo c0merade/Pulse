@@ -139,7 +139,12 @@ html.dark .bg-amber-50\/70,
 html.dark .bg-amber-50\/40 {
   background-color: #1d1b12 !important;
 }
-html.dark .bg-\[\#00e5cc\],
+html.dark .bg-\[\#00e5cc\] {
+  color: #090c10 !important;
+}
 html.dark .bg-\[\#ffe600\] {
   color: #090c10 !important;
+}
+html.dark .bg-\[\#e000df\] {
+  color: #ffffff !important;
 }

@@ -142,7 +142,7 @@ export default async function DashboardPage() {
           </div>
           <Link
             href="/surveys"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#00e5cc] hover:bg-[#00d4bd] text-slate-950 text-sm font-extrabold transition-all shadow-[0_0_20px_rgba(0,229,204,0.28)] self-start"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#e000df] hover:bg-[#c400c3] text-white text-sm font-extrabold transition-all shadow-[0_0_22px_rgba(224,0,223,0.34)] self-start"
           >
             <ClipboardList className="w-4 h-4 stroke-[2.5]" />
             {t.dashboard.manageSurveys}
