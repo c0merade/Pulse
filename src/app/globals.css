@@ -1,26 +1,34 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
-
 :root {
   --background: #f3f6f8;
   --surface: #ffffff;
-  --surface-elevated: #f8fafc;
+  --surface-elevated: #f1f5f9;
   --foreground: #0b1116;
   --muted: #4b5563;
   --border: #e2e8f0;
   --pulse-cyan: #00d4bd;
   --pulse-cyan-bright: #00f0d8;
   --pulse-yellow: #ffe600;
+  --accent-text: #0f766e;
+  --yellow-text: #b45309;
+  --banner-warn-bg: #fffbeb;
+  --banner-warn-border: #fde68a;
+  --input-bg: #f8fafc;
 }
 
-.dark {
-  --background: #0d0f12;
-  --surface: #16191e;
-  --surface-elevated: #1e2229;
+html.dark {
+  --background: #0b0d10;
+  --surface: #15181e;
+  --surface-elevated: #1e222a;
   --foreground: #f8fafc;
   --muted: #9ca3af;
   --border: rgba(255, 255, 255, 0.09);
+  --accent-text: #00f0d8;
+  --yellow-text: #ffe600;
+  --banner-warn-bg: #1d1b12;
+  --banner-warn-border: rgba(255, 230, 0, 0.35);
+  --input-bg: #1d2129;
 }
 
 @theme inline {
@@ -39,20 +47,99 @@ body {
 
 .bento-card {
   background: var(--surface);
+  color: var(--foreground);
   border: 1px solid var(--border);
   border-radius: 1.25rem;
 }
 
 .bento-inner {
   background: var(--surface-elevated);
+  color: var(--foreground);
   border: 1px solid var(--border);
   border-radius: 0.875rem;
 }
 
-.glow-cyan {
-  box-shadow: 0 0 24px rgba(0, 240, 216, 0.16);
+.bento-warn {
+  background: var(--banner-warn-bg);
+  border: 1px solid var(--banner-warn-border);
+  border-radius: 1.25rem;
 }
 
-.glow-yellow {
-  box-shadow: 0 0 24px rgba(255, 230, 0, 0.18);
+.pulse-input {
+  background: var(--input-bg);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+
+.text-primary {
+  color: var(--foreground);
+}
+
+.text-muted {
+  color: var(--muted);
+}
+
+.text-cyan-accent {
+  color: var(--accent-text);
+}
+
+.text-yellow-accent {
+  color: var(--yellow-text);
+}
+
+/* Guarantee crisp dark-mode contrast across all pages */
+html.dark .text-slate-950:not(.bg-\[\#00e5cc\]):not(.bg-\[\#ffe600\]),
+html.dark .text-slate-900:not(.bg-\[\#00e5cc\]):not(.bg-\[\#ffe600\]),
+html.dark .text-slate-800:not(.bg-\[\#00e5cc\]):not(.bg-\[\#ffe600\]) {
+  color: #f8fafc !important;
+}
+html.dark .text-slate-700 {
+  color: #e2e8f0 !important;
+}
+html.dark .text-slate-600,
+html.dark .text-slate-500 {
+  color: #94a3b8 !important;
+}
+html.dark .bg-white {
+  background-color: #15181e !important;
+}
+html.dark .bg-slate-50,
+html.dark .bg-slate-100,
+html.dark .bg-slate-200 {
+  background-color: #1e222a !important;
+}
+html.dark .border-slate-200,
+html.dark .border-slate-300,
+html.dark .border-slate-100 {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+html.dark .divide-slate-100 > :not(:last-child) {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+html.dark .text-teal-600,
+html.dark .text-teal-700,
+html.dark .text-teal-800,
+html.dark .text-teal-900 {
+  color: #00f0d8 !important;
+}
+html.dark .text-amber-600,
+html.dark .text-amber-800,
+html.dark .text-amber-900 {
+  color: #ffe600 !important;
+}
+html.dark .text-rose-600,
+html.dark .text-rose-700 {
+  color: #fb7185 !important;
+}
+html.dark .text-sky-700,
+html.dark .text-sky-800 {
+  color: #38bdf8 !important;
+}
+html.dark .bg-amber-50\/70,
+html.dark .bg-amber-50\/40 {
+  background-color: #1d1b12 !important;
+}
+html.dark .bg-\[\#00e5cc\],
+html.dark .bg-\[\#ffe600\] {
+  color: #090c10 !important;
 }

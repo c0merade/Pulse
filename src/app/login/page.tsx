@@ -74,8 +74,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f3f6f8] dark:bg-[#0d0f12] flex items-center justify-center p-4 transition-colors">
-      <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 rounded-3xl border border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#16191e] shadow-2xl overflow-hidden">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] flex items-center justify-center p-4 transition-colors">
+      <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 rounded-3xl border border-[var(--border)] bg-[var(--surface)] shadow-2xl overflow-hidden">
         {/* Left Bento Brand Panel */}
         <div className="bg-[#111418] text-white p-8 md:p-10 flex flex-col justify-between relative overflow-hidden">
           <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-[#00e5cc]/15 blur-3xl pointer-events-none" />
@@ -165,16 +165,16 @@ export default function LoginPage() {
         </div>
 
         {/* Right Sign-in Panel */}
-        <div className="p-8 md:p-10 flex flex-col justify-center">
-          <h2 className="text-2xl font-extrabold text-slate-950 dark:text-white tracking-tight">
+        <div className="p-8 md:p-10 flex flex-col justify-center bg-[var(--surface)]">
+          <h2 className="text-2xl font-extrabold text-primary tracking-tight">
             {t.login.title}
           </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">
+          <p className="text-sm text-muted mt-1 font-medium">
             {t.login.subtitle}
           </p>
 
           {error && (
-            <div className="mt-4 rounded-xl bg-rose-500/10 border border-rose-500/30 px-4 py-3 text-sm font-semibold text-rose-600 dark:text-rose-400">
+            <div className="mt-4 rounded-xl bg-rose-500/10 border border-rose-500/30 px-4 py-3 text-sm font-semibold text-rose-500">
               {error}
             </div>
           )}
@@ -187,20 +187,20 @@ export default function LoginPage() {
             className="mt-6 space-y-4"
           >
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-muted mb-1.5">
                 {t.login.email}
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 dark:border-white/[0.12] bg-slate-50 dark:bg-[#1e2229] px-4 py-2.5 text-sm font-semibold text-slate-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00e5cc]/50 focus:border-[#00e5cc]"
+                className="w-full rounded-xl pulse-input px-4 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#00e5cc]/50 focus:border-[#00e5cc]"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-muted mb-1.5">
                 {t.login.password}
               </label>
               <div className="relative">
@@ -208,10 +208,10 @@ export default function LoginPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 dark:border-white/[0.12] bg-slate-50 dark:bg-[#1e2229] px-4 py-2.5 text-sm font-semibold text-slate-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00e5cc]/50 focus:border-[#00e5cc]"
+                  className="w-full rounded-xl pulse-input px-4 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#00e5cc]/50 focus:border-[#00e5cc]"
                   required
                 />
-                <Lock className="w-4 h-4 text-slate-400 absolute right-3.5 top-3" />
+                <Lock className="w-4 h-4 text-muted absolute right-3.5 top-3" />
               </div>
             </div>
 
@@ -226,8 +226,8 @@ export default function LoginPage() {
           </form>
 
           {/* Quick Role Switcher */}
-          <div className="mt-7 pt-6 border-t border-slate-200 dark:border-white/[0.08]">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
+          <div className="mt-7 pt-6 border-t border-[var(--border)]">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-muted mb-3">
               {t.login.quickTitle}
             </div>
             <div className="grid grid-cols-2 gap-2.5">
@@ -241,12 +241,12 @@ export default function LoginPage() {
                     setPassword("pulse123");
                     doLogin(acc.email, "pulse123");
                   }}
-                  className="text-left p-3 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-[#1e2229] hover:border-[#00e5cc] hover:bg-[#00e5cc]/10 transition-all cursor-pointer"
+                  className="text-left p-3 rounded-xl bento-inner hover:border-[#00e5cc] hover:bg-[#00e5cc]/10 transition-all cursor-pointer"
                 >
-                  <div className="text-xs font-extrabold text-slate-950 dark:text-white">
+                  <div className="text-xs font-extrabold text-primary">
                     {acc.label}
                   </div>
-                  <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                  <div className="text-[11px] font-medium text-muted truncate mt-0.5">
                     {acc.scope}
                   </div>
                 </button>

@@ -169,19 +169,19 @@ export default async function DashboardPage() {
           </div>
 
           <div className="bento-card p-5">
-            <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-muted">
               {t.dashboard.kpiTurnout}
-              <span className="w-8 h-8 rounded-xl bg-[#ffe600]/20 text-amber-600 dark:text-[#ffe600] flex items-center justify-center">
+              <span className="w-8 h-8 rounded-xl bg-[#ffe600]/20 text-yellow-accent flex items-center justify-center">
                 <Users className="w-4 h-4" />
               </span>
             </div>
-            <div className="mt-3 flex items-baseline gap-2">
-              <span className="text-4xl font-extrabold text-slate-950 dark:text-white">
+            <div className="mt-3">
+              <div className="text-4xl font-extrabold text-primary">
                 {avgResponseRate}%
-              </span>
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+              </div>
+              <div className="text-xs font-semibold text-muted mt-1">
                 {t.dashboard.kpiAutoStop}
-              </span>
+              </div>
             </div>
           </div>
 
@@ -322,11 +322,11 @@ export default async function DashboardPage() {
                       className="block bento-inner p-4 hover:border-[#00e5cc] transition-all"
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <span className="font-extrabold text-sm text-slate-950 dark:text-white">
+                        <span className="font-extrabold text-sm text-primary whitespace-nowrap">
                           {s.group.name}
                         </span>
                         <span
-                          className={`inline-flex items-center gap-1 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full ${
+                          className={`inline-flex items-center gap-1 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full whitespace-nowrap ${
                             targetMet
                               ? "bg-[#00e5cc]/20 text-teal-800 dark:text-[#00f0d8]"
                               : "bg-[#ffe600]/25 text-amber-800 dark:text-[#ffe600]"

@@ -130,17 +130,17 @@ export default async function ComparePage() {
             {t.compare.tableTitle}
           </h2>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
+            <table className="w-full text-xs text-left">
               <thead>
-                <tr className="border-b border-slate-200 dark:border-white/[0.08] text-xs font-bold uppercase text-slate-500 dark:text-slate-400">
-                  <th className="py-3 pr-4">{t.compare.colGroup}</th>
-                  <th className="py-3 px-3">{t.compare.colSample}</th>
-                  <th className="py-3 px-3">{t.categories.LECTURES}</th>
-                  <th className="py-3 px-3">{t.categories.PRACTICE}</th>
-                  <th className="py-3 px-3">{t.categories.MATERIALS}</th>
-                  <th className="py-3 px-3">{t.categories.ORGANIZATION}</th>
-                  <th className="py-3 px-3">{t.compare.colOverall}</th>
-                  <th className="py-3 pl-3">{t.compare.colConfidence}</th>
+                <tr className="border-b border-slate-200 dark:border-white/[0.08] text-[11px] font-bold uppercase text-slate-500 dark:text-slate-400">
+                  <th className="py-3 pr-3">{t.compare.colGroup}</th>
+                  <th className="py-3 px-2">{t.compare.colSample}</th>
+                  <th className="py-3 px-2">{t.categories.LECTURES}</th>
+                  <th className="py-3 px-2">{t.categories.PRACTICE}</th>
+                  <th className="py-3 px-2">{t.categories.MATERIALS}</th>
+                  <th className="py-3 px-2">{t.categories.ORGANIZATION}</th>
+                  <th className="py-3 px-2">{t.compare.colOverall}</th>
+                  <th className="py-3 pl-2">{t.compare.colConfidence}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-white/[0.06]">

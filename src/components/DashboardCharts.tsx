@@ -81,6 +81,7 @@ export function TrendLineChart({
             stroke="#00f0d8"
             strokeWidth={3}
             dot={{ r: 5, fill: "#00f0d8" }}
+            isAnimationActive={false}
           />
           <Line
             type="monotone"
@@ -89,6 +90,7 @@ export function TrendLineChart({
             stroke="#ffe600"
             strokeWidth={3}
             dot={{ r: 5, fill: "#ffe600" }}
+            isAnimationActive={false}
           />
           <Line
             type="monotone"
@@ -97,6 +99,7 @@ export function TrendLineChart({
             stroke="#34d399"
             strokeWidth={2.5}
             dot={{ r: 4, fill: "#34d399" }}
+            isAnimationActive={false}
           />
           <Line
             type="monotone"
@@ -105,6 +108,7 @@ export function TrendLineChart({
             stroke="#38bdf8"
             strokeWidth={2.5}
             dot={{ r: 4, fill: "#38bdf8" }}
+            isAnimationActive={false}
           />
         </LineChart>
       </ResponsiveContainer>
@@ -172,10 +176,10 @@ export function ComparisonBarChart({
             }}
           />
           <Legend wrapperStyle={{ fontSize: "12px", fontWeight: 600 }} />
-          <Bar dataKey="lectures" name={labels.lectures} fill="#00f0d8" radius={[6, 6, 0, 0]} />
-          <Bar dataKey="practice" name={labels.practice} fill="#ffe600" radius={[6, 6, 0, 0]} />
-          <Bar dataKey="materials" name={labels.materials} fill="#34d399" radius={[6, 6, 0, 0]} />
-          <Bar dataKey="organization" name={labels.organization} fill="#38bdf8" radius={[6, 6, 0, 0]} />
+          <Bar dataKey="lectures" name={labels.lectures} fill="#00f0d8" radius={[6, 6, 0, 0]} isAnimationActive={false} />
+          <Bar dataKey="practice" name={labels.practice} fill="#ffe600" radius={[6, 6, 0, 0]} isAnimationActive={false} />
+          <Bar dataKey="materials" name={labels.materials} fill="#34d399" radius={[6, 6, 0, 0]} isAnimationActive={false} />
+          <Bar dataKey="organization" name={labels.organization} fill="#38bdf8" radius={[6, 6, 0, 0]} isAnimationActive={false} />
         </BarChart>
       </ResponsiveContainer>
     </div>
