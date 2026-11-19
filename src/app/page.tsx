@@ -263,12 +263,14 @@ export default async function DashboardPage() {
                   Average ratings (1–5) across all groups per survey wave
                 </p>
               </div>
-              <Link
-                href="/compare"
-                className="text-xs font-medium text-indigo-600 hover:text-indigo-800 inline-flex items-center gap-1"
-              >
-                Compare groups <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+              {user.role !== "LECTURER" && (
+                <Link
+                  href="/compare"
+                  className="text-xs font-medium text-indigo-600 hover:text-indigo-800 inline-flex items-center gap-1"
+                >
+                  Compare groups <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              )}
             </div>
             <TrendLineChart data={trendData} />
           </div>
