@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { cookies } from "next/headers";
+import { Geist, Geist_Mono, Noto_Sans_Armenian } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,23 +13,35 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const notoArmenian = Noto_Sans_Armenian({
+  variable: "--font-armenian",
+  subsets: ["armenian", "latin"],
+  weight: ["400", "500", "600", "700", "800"],
+});
+
 export const metadata: Metadata = {
-  title: "Pulse — Academy Quality Surveys & Issue Tracker",
+  title: "Pulse — Picsart Academy Որակի Հարցումներ և Խնդիրների Թրեքեր",
   description:
-    "Quality surveys that summarize themselves, flag score drops, and turn student complaints into verified fixes.",
+    "Որակի հարցումներ, AI ամփոփում, տրենդների վերլուծություն և խնդիրների հաստատված լուծումներ Picsart Academy-ի համար։",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const theme = cookieStore.get("pulse_theme")?.value === "light" ? "light" : "dark";
+  const lang = cookieStore.get("pulse_lang")?.value === "en" ? "en" : "hy";
+
   return (
     <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      lang={lang}
+      className={`${theme === "dark" ? "dark" : ""} ${notoArmenian.variable} ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-slate-50 text-slate-900">{children}</body>
+      <body className="min-h-full bg-[var(--background)] text-[var(--foreground)] transition-colors duration-200">
+        {children}
+      </body>
     </html>
   );
 }

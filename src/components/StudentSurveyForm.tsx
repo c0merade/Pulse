@@ -82,38 +82,38 @@ export function StudentSurveyForm({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-xl bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <div className="min-h-screen bg-[#f3f6f8] dark:bg-[#0d0f12] flex items-center justify-center p-4 transition-colors">
+      <div className="w-full max-w-xl bento-card shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="bg-indigo-600 text-white px-6 py-5 flex items-start justify-between gap-3">
+        <div className="bg-[#111418] text-white px-6 py-6 flex items-start justify-between gap-3 border-b border-white/[0.08]">
           <div>
-            <div className="flex items-center gap-2 text-indigo-100 text-xs font-medium mb-1">
-              <Activity className="w-4 h-4" />
+            <div className="flex items-center gap-2 text-[#ffe600] text-xs font-extrabold uppercase tracking-wider mb-1.5">
+              <Activity className="w-4 h-4 text-[#00f0d8]" />
               {t.badge}
             </div>
-            <h1 className="text-xl font-bold">{survey.title}</h1>
-            <p className="text-sm text-indigo-100 mt-0.5">
+            <h1 className="text-2xl font-extrabold">{survey.title}</h1>
+            <p className="text-sm text-slate-300 mt-1 font-medium">
               {survey.groupName} · {survey.courseName} ({survey.lecturerName})
             </p>
           </div>
-          <div className="inline-flex items-center rounded-lg bg-indigo-700/80 p-0.5 text-[11px] font-semibold shrink-0">
-            <button
-              type="button"
-              onClick={() => setLang("en")}
-              className={`px-2 py-0.5 rounded-md cursor-pointer ${
-                lang === "en" ? "bg-white text-indigo-700" : "text-indigo-100"
-              }`}
-            >
-              EN
-            </button>
+          <div className="inline-flex items-center rounded-xl bg-white/[0.08] p-0.5 text-[11px] font-extrabold shrink-0">
             <button
               type="button"
               onClick={() => setLang("hy")}
-              className={`px-2 py-0.5 rounded-md cursor-pointer ${
-                lang === "hy" ? "bg-white text-indigo-700" : "text-indigo-100"
+              className={`px-2.5 py-1 rounded-lg cursor-pointer ${
+                lang === "hy" ? "bg-[#00e5cc] text-slate-950" : "text-slate-300"
               }`}
             >
               ՀԱՅ
+            </button>
+            <button
+              type="button"
+              onClick={() => setLang("en")}
+              className={`px-2.5 py-1 rounded-lg cursor-pointer ${
+                lang === "en" ? "bg-[#00e5cc] text-slate-950" : "text-slate-300"
+              }`}
+            >
+              ENG
             </button>
           </div>
         </div>
@@ -170,10 +170,10 @@ export function StudentSurveyForm({
                             key={val}
                             type="button"
                             onClick={() => setScores({ ...scores, [q.key]: val })}
-                            className={`py-2.5 rounded-lg border text-sm font-semibold transition-all cursor-pointer ${
+                            className={`py-2.5 rounded-xl border text-sm font-extrabold transition-all cursor-pointer ${
                               selected
-                                ? "bg-indigo-600 border-indigo-600 text-white shadow-xs"
-                                : "bg-white border-slate-200 text-slate-700 hover:border-indigo-300 hover:bg-indigo-50/40"
+                                ? "bg-[#00e5cc] border-[#00e5cc] text-slate-950 shadow-[0_0_16px_rgba(0,229,204,0.35)]"
+                                : "bg-slate-50 dark:bg-[#1e2229] border-slate-200 dark:border-white/[0.1] text-slate-700 dark:text-slate-200 hover:border-[#00e5cc]"
                             }`}
                           >
                             {val}
@@ -253,7 +253,7 @@ export function StudentSurveyForm({
               <button
                 type="submit"
                 disabled={submitting || !isComplete}
-                className="w-full py-3 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 transition-colors shadow-sm cursor-pointer"
+                className="w-full py-3.5 rounded-xl bg-[#00e5cc] hover:bg-[#00d4bd] text-slate-950 text-sm font-extrabold disabled:opacity-50 transition-all shadow-[0_0_20px_rgba(0,229,204,0.28)] cursor-pointer"
               >
                 {submitting ? t.submitting : t.submit}
               </button>

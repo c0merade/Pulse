@@ -1,19 +1,58 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #f3f6f8;
+  --surface: #ffffff;
+  --surface-elevated: #f8fafc;
+  --foreground: #0b1116;
+  --muted: #4b5563;
+  --border: #e2e8f0;
+  --pulse-cyan: #00d4bd;
+  --pulse-cyan-bright: #00f0d8;
+  --pulse-yellow: #ffe600;
+}
+
+.dark {
+  --background: #0d0f12;
+  --surface: #16191e;
+  --surface-elevated: #1e2229;
+  --foreground: #f8fafc;
+  --muted: #9ca3af;
+  --border: rgba(255, 255, 255, 0.09);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-armenian), var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-armenian), var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.bento-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+}
+
+.bento-inner {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+}
+
+.glow-cyan {
+  box-shadow: 0 0 24px rgba(0, 240, 216, 0.16);
+}
+
+.glow-yellow {
+  box-shadow: 0 0 24px rgba(255, 230, 0, 0.18);
 }

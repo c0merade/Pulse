@@ -240,7 +240,7 @@ export function SurveyDetailClient({ survey }: SurveyDetailProps) {
                 {survey.group.courseName} ({survey.group.lecturerName})
               </span>
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 mt-0.5">
+            <h1 className="text-3xl font-extrabold text-slate-950 dark:text-white mt-0.5">
               {survey.title}
             </h1>
           </div>
@@ -249,23 +249,23 @@ export function SurveyDetailClient({ survey }: SurveyDetailProps) {
               <button
                 onClick={handleSendReminders}
                 disabled={reminding}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50 disabled:opacity-60 cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#ffe600] hover:bg-[#f5d800] text-slate-950 text-sm font-extrabold disabled:opacity-60 cursor-pointer"
               >
-                <Bell className="w-4 h-4 text-amber-500" />
-                {reminding ? "Reminding..." : "Remind Pending"}
+                <Bell className="w-4 h-4 stroke-[2.5]" />
+                {reminding ? "Ուղարկվում է..." : "Հիշեցնել չպատասխանածներին"}
               </button>
             )}
             <button
               onClick={handleRunAnalysis}
               disabled={analyzing || survey.responses.length === 0}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 disabled:opacity-60 shadow-sm cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#00e5cc] hover:bg-[#00d4bd] text-slate-950 text-sm font-extrabold disabled:opacity-60 shadow-[0_0_20px_rgba(0,229,204,0.28)] cursor-pointer"
             >
-              <Sparkles className="w-4 h-4" />
+              <Sparkles className="w-4 h-4 stroke-[2.5]" />
               {analyzing
-                ? "Analyzing..."
+                ? "Վերլուծվում է..."
                 : survey.analysis
-                  ? "Re-run AI Summary"
-                  : "Run AI Summary"}
+                  ? "Թարմացնել AI ամփոփումը"
+                  : "Գործարկել AI ամփոփումը"}
             </button>
           </div>
         </div>

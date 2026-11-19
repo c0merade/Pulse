@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+import { getServerLang } from "@/lib/i18n-server";
 import { AppShell } from "@/components/AppShell";
 import { GroupsClient } from "@/components/GroupsClient";
 
@@ -11,6 +12,7 @@ export default async function GroupsPage() {
   if (!user) redirect("/login");
   if (user.role === "LECTURER") redirect("/");
 
+  const lang = await getServerLang();
   const aiMode = process.env.GEMINI_API_KEY?.trim() ? "GEMINI" : "FALLBACK";
   const syncConfigured = Boolean(process.env.PLATFORM_API_KEY?.trim());
 
@@ -39,8 +41,8 @@ export default async function GroupsPage() {
   }));
 
   return (
-    <AppShell aiMode={aiMode} user={user}>
-      <GroupsClient groups={serialized} syncConfigured={syncConfigured} />
+    <AppShell aiMode={aiMode} user={user} initialLang={lang}>
+      <GroupsClient groups={serialized} syncConfigured={syncConfigured} lang={lang} />
     </AppShell>
   );
 }

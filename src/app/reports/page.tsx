@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { computeAverages, detectDrops, ThemeCluster } from "@/lib/analytics";
 import { getCurrentUser } from "@/lib/auth";
+import { getServerLang } from "@/lib/i18n-server";
 import { AppShell } from "@/components/AppShell";
 import { BriefData, MeetingBriefClient } from "@/components/MeetingBriefClient";
 
@@ -12,6 +13,7 @@ export default async function ReportsPage() {
   if (!user) redirect("/login");
   if (user.role === "LECTURER") redirect("/");
 
+  const lang = await getServerLang();
   const aiMode = process.env.GEMINI_API_KEY?.trim() ? "GEMINI" : "FALLBACK";
 
   const [groups, issues] = await Promise.all([
@@ -130,8 +132,8 @@ export default async function ReportsPage() {
   };
 
   return (
-    <AppShell aiMode={aiMode} user={user}>
-      <MeetingBriefClient data={briefData} />
+    <AppShell aiMode={aiMode} user={user} initialLang={lang}>
+      <MeetingBriefClient data={briefData} lang={lang} />
     </AppShell>
   );
 }

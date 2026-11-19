@@ -15,6 +15,7 @@ import {
   Users,
   X,
 } from "lucide-react";
+import { DICT, Lang } from "@/lib/i18n";
 
 interface StudentRow {
   id: string;
@@ -37,11 +38,14 @@ interface GroupRow {
 export function GroupsClient({
   groups,
   syncConfigured,
+  lang = "hy",
 }: {
   groups: GroupRow[];
   syncConfigured: boolean;
+  lang?: Lang;
 }) {
   const router = useRouter();
+  const t = DICT[lang];
   const [showArchived, setShowArchived] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(
     groups[0]?.id ?? null
@@ -212,28 +216,28 @@ export function GroupsClient({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Groups &amp; Student Rosters
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white">
+            {t.groups.title}
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Manage Picsart Academy cohorts, lecturers, CSV student imports, and main-platform sync.
+          <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mt-1">
+            {t.groups.subtitle}
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setShowSyncDocs((v) => !v)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#ffe600] hover:bg-[#f5d800] text-slate-950 text-sm font-extrabold cursor-pointer"
           >
-            <Code2 className="w-4 h-4 text-indigo-600" />
-            Platform Sync API
+            <Code2 className="w-4 h-4 stroke-[2.5]" />
+            {t.groups.syncApi}
           </button>
           <button
             onClick={() => setShowGroupModal(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 shadow-sm cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#00e5cc] hover:bg-[#00d4bd] text-slate-950 text-sm font-extrabold shadow-[0_0_20px_rgba(0,229,204,0.28)] cursor-pointer"
           >
-            <Plus className="w-4 h-4" />
-            New Group
+            <Plus className="w-4 h-4 stroke-[2.5]" />
+            {t.groups.newGroup}
           </button>
         </div>
       </div>
@@ -316,10 +320,8 @@ curl -X POST http://localhost:3000/api/v1/sync/students \\
           return (
             <div
               key={g.id}
-              className={`bg-white rounded-xl border shadow-xs overflow-hidden ${
-                g.isArchived
-                  ? "border-slate-200 opacity-75"
-                  : "border-slate-200"
+              className={`bento-card overflow-hidden ${
+                g.isArchived ? "opacity-75" : ""
               }`}
             >
               <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -327,41 +329,41 @@ curl -X POST http://localhost:3000/api/v1/sync/students \\
                   onClick={() => setExpandedId(isOpen ? null : g.id)}
                   className="text-left flex items-start gap-3 flex-1 cursor-pointer"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#00e5cc]/15 text-teal-600 dark:text-[#00f0d8] flex items-center justify-center shrink-0">
                     <Users className="w-5 h-5" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-base text-slate-900">
+                      <span className="font-extrabold text-base text-slate-950 dark:text-white">
                         {g.name}
                       </span>
                       {g.isArchived && (
-                        <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-medium">
-                          Archived
+                        <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-200 dark:bg-white/[0.08] text-slate-600 dark:text-slate-400 font-bold">
+                          {t.groups.archived}
                         </span>
                       )}
                     </div>
-                    <div className="text-xs text-slate-500 mt-0.5">
-                      {g.courseName} · Lecturer:{" "}
-                      <strong className="text-slate-700">{g.lecturerName}</strong>
+                    <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5">
+                      {g.courseName} · {t.groups.lecturer}:{" "}
+                      <strong className="text-slate-800 dark:text-slate-200">{g.lecturerName}</strong>
                       {g.lecturerEmail && ` (${g.lecturerEmail})`}
                     </div>
                   </div>
                 </button>
 
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 font-medium">
-                    {g.students.length} students
+                  <span className="text-xs px-2.5 py-1 rounded-full bg-slate-100 dark:bg-white/[0.08] text-slate-800 dark:text-slate-200 font-bold">
+                    {g.students.length} {t.groups.students}
                   </span>
-                  <span className="text-xs px-2.5 py-1 rounded-md bg-slate-100 text-slate-600">
-                    {g.surveysCount} surveys
+                  <span className="text-xs px-2.5 py-1 rounded-full bg-slate-100 dark:bg-white/[0.08] text-slate-600 dark:text-slate-400 font-semibold">
+                    {g.surveysCount} {t.groups.surveys}
                   </span>
                   <button
                     onClick={() => setCsvGroup(g)}
-                    className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 cursor-pointer"
+                    className="inline-flex items-center gap-1 text-xs font-extrabold px-3 py-1.5 rounded-xl bg-[#00e5cc]/15 text-teal-800 dark:text-[#00f0d8] hover:bg-[#00e5cc]/25 cursor-pointer"
                   >
                     <Upload className="w-3.5 h-3.5" />
-                    CSV Import
+                    {t.groups.csvImport}
                   </button>
                   <button
                     onClick={() => handleToggleArchive(g)}

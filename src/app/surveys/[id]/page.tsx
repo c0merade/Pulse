@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { computeAverages, computeDeltas, detectDrops } from "@/lib/analytics";
 import { getCurrentUser } from "@/lib/auth";
+import { getServerLang } from "@/lib/i18n-server";
 import { AppShell } from "@/components/AppShell";
 import { SurveyDetailClient } from "@/components/SurveyDetailClient";
 
@@ -15,6 +16,7 @@ export default async function SurveyDetailPage({
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
+  const lang = await getServerLang();
   const { id } = await params;
   const aiMode = process.env.GEMINI_API_KEY?.trim() ? "GEMINI" : "FALLBACK";
 
@@ -70,7 +72,7 @@ export default async function SurveyDetailPage({
     totalInvites > 0 ? Math.round((respondedCount / totalInvites) * 100) : 0;
 
   return (
-    <AppShell aiMode={aiMode} user={user}>
+    <AppShell aiMode={aiMode} user={user} initialLang={lang}>
       <SurveyDetailClient
         survey={{
           id: survey.id,

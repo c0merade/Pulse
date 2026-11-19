@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser, getGroupScopeWhere } from "@/lib/auth";
+import { getServerLang } from "@/lib/i18n-server";
 import { AppShell } from "@/components/AppShell";
 import { IssuesClient } from "@/components/IssuesClient";
 
@@ -10,6 +11,7 @@ export default async function IssuesPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
+  const lang = await getServerLang();
   const aiMode = process.env.GEMINI_API_KEY?.trim() ? "GEMINI" : "FALLBACK";
   const groupScope = getGroupScopeWhere(user);
 
@@ -46,8 +48,8 @@ export default async function IssuesPage() {
   }));
 
   return (
-    <AppShell aiMode={aiMode} user={user}>
-      <IssuesClient issues={serialized} groups={groups} />
+    <AppShell aiMode={aiMode} user={user} initialLang={lang}>
+      <IssuesClient issues={serialized} groups={groups} lang={lang} />
     </AppShell>
   );
 }

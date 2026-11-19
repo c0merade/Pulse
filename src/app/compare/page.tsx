@@ -14,6 +14,8 @@ import {
   getFairnessStatus,
 } from "@/lib/analytics";
 import { getCurrentUser } from "@/lib/auth";
+import { DICT } from "@/lib/i18n";
+import { getServerLang } from "@/lib/i18n-server";
 import { AppShell } from "@/components/AppShell";
 import {
   ComparisonBarChart,
@@ -27,6 +29,8 @@ export default async function ComparePage() {
   if (!user) redirect("/login");
   if (user.role === "LECTURER") redirect("/");
 
+  const lang = await getServerLang();
+  const t = DICT[lang];
   const aiMode = process.env.GEMINI_API_KEY?.trim() ? "GEMINI" : "FALLBACK";
 
   const groups = await prisma.group.findMany({
@@ -65,7 +69,6 @@ export default async function ComparePage() {
       courseName: g.courseName,
       lecturerName: g.lecturerName,
       latestSurveyId: latest?.id ?? null,
-      latestSurveyTitle: latest?.title ?? "No survey",
       sampleSize: respondedCount,
       totalInvites,
       responseRate,
@@ -86,72 +89,76 @@ export default async function ComparePage() {
     }));
 
   return (
-    <AppShell aiMode={aiMode} user={user}>
+    <AppShell aiMode={aiMode} user={user} initialLang={lang}>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Fair Group &amp; Lecturer Comparison
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white">
+            {t.compare.title}
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Compare latest wave scores carefully alongside sample size, turnout rate, and wave-over-wave momentum.
+          <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mt-1">
+            {t.compare.subtitle}
           </p>
         </div>
 
         {/* Fairness Guardrail Banner */}
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
-          <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-          <div className="text-sm text-amber-900">
-            <strong className="font-semibold">Fairness Guardrails Active:</strong>{" "}
-            Groups or lecturers with fewer than <strong>5 responses</strong> or under{" "}
-            <strong>50% turnout</strong> are flagged as <em>Low Sample</em> (marked with{" "}
-            <code>*</code>). Always read scores together with sample size and trend direction rather than raw rankings.
+        <div className="bento-card p-5 border-[#ffe600]/40 bg-amber-50/70 dark:bg-[#1c1b14] flex items-start gap-3">
+          <span className="w-7 h-7 rounded-full bg-[#ffe600] text-slate-950 flex items-center justify-center shrink-0 mt-0.5">
+            <Info className="w-4 h-4 stroke-[2.5]" />
+          </span>
+          <div className="text-sm font-medium text-slate-800 dark:text-slate-200">
+            <strong className="font-extrabold text-slate-950 dark:text-[#ffe600]">
+              {t.compare.guardTitle}
+            </strong>{" "}
+            {t.compare.guardBody}
           </div>
         </div>
 
         {/* Bar Chart */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
-          <h2 className="text-base font-semibold text-slate-900 mb-1">
-            Latest Wave Scores by Group
+        <div className="bento-card p-6">
+          <h2 className="text-lg font-extrabold text-slate-950 dark:text-white mb-1">
+            {t.compare.chartTitle}
           </h2>
-          <p className="text-xs text-slate-500 mb-4">
-            Four quality dimensions (1–5 scale). Asterisk (*) indicates low-confidence sample.
+          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-4">
+            {t.compare.chartSub}
           </p>
-          <ComparisonBarChart data={chartData} />
+          <ComparisonBarChart data={chartData} lang={lang} />
         </div>
 
         {/* Detailed Comparison Table */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
-          <h2 className="text-base font-semibold text-slate-900 mb-4">
-            Group &amp; Lecturer Breakdown
+        <div className="bento-card p-6">
+          <h2 className="text-lg font-extrabold text-slate-950 dark:text-white mb-4">
+            {t.compare.tableTitle}
           </h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
               <thead>
-                <tr className="border-b border-slate-200 text-xs uppercase text-slate-500">
-                  <th className="py-2.5 pr-4 font-medium">Group &amp; Lecturer</th>
-                  <th className="py-2.5 px-3 font-medium">Sample</th>
-                  <th className="py-2.5 px-3 font-medium">Lectures</th>
-                  <th className="py-2.5 px-3 font-medium">Practice</th>
-                  <th className="py-2.5 px-3 font-medium">Materials</th>
-                  <th className="py-2.5 px-3 font-medium">Org</th>
-                  <th className="py-2.5 px-3 font-medium">Overall / Trend</th>
-                  <th className="py-2.5 pl-3 font-medium">Confidence</th>
+                <tr className="border-b border-slate-200 dark:border-white/[0.08] text-xs font-bold uppercase text-slate-500 dark:text-slate-400">
+                  <th className="py-3 pr-4">{t.compare.colGroup}</th>
+                  <th className="py-3 px-3">{t.compare.colSample}</th>
+                  <th className="py-3 px-3">{t.categories.LECTURES}</th>
+                  <th className="py-3 px-3">{t.categories.PRACTICE}</th>
+                  <th className="py-3 px-3">{t.categories.MATERIALS}</th>
+                  <th className="py-3 px-3">{t.categories.ORGANIZATION}</th>
+                  <th className="py-3 px-3">{t.compare.colOverall}</th>
+                  <th className="py-3 pl-3">{t.compare.colConfidence}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-white/[0.06]">
                 {rows.map((r) => (
                   <tr
                     key={r.groupId}
                     className={
-                      r.fairness.reliable ? "hover:bg-slate-50/70" : "bg-amber-50/30"
+                      r.fairness.reliable
+                        ? "hover:bg-slate-50/70 dark:hover:bg-white/[0.03]"
+                        : "bg-amber-50/40 dark:bg-[#ffe600]/[0.04]"
                     }
                   >
                     <td className="py-3.5 pr-4">
-                      <div className="font-semibold text-slate-900">
+                      <div className="font-extrabold text-slate-950 dark:text-white">
                         {r.latestSurveyId ? (
                           <Link
                             href={`/surveys/${r.latestSurveyId}`}
-                            className="hover:text-indigo-600"
+                            className="hover:text-teal-600 dark:hover:text-[#00f0d8]"
                           >
                             {r.groupName}
                           </Link>
@@ -159,37 +166,37 @@ export default async function ComparePage() {
                           r.groupName
                         )}
                       </div>
-                      <div className="text-xs text-slate-500">
+                      <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
                         {r.lecturerName} · {r.courseName}
                       </div>
                     </td>
-                    <td className="py-3.5 px-3 whitespace-nowrap text-xs text-slate-600">
-                      <strong>n={r.sampleSize}</strong>/{r.totalInvites} ({r.responseRate}%)
+                    <td className="py-3.5 px-3 whitespace-nowrap text-xs font-bold text-slate-700 dark:text-slate-300">
+                      n={r.sampleSize}/{r.totalInvites} ({r.responseRate}%)
                     </td>
-                    <td className="py-3.5 px-3 font-medium">
+                    <td className="py-3.5 px-3 font-bold">
                       {r.averages ? r.averages.lectures.toFixed(1) : "—"}
                     </td>
-                    <td className="py-3.5 px-3 font-medium">
+                    <td className="py-3.5 px-3 font-bold">
                       {r.averages ? r.averages.practice.toFixed(1) : "—"}
                     </td>
-                    <td className="py-3.5 px-3 font-medium">
+                    <td className="py-3.5 px-3 font-bold">
                       {r.averages ? r.averages.materials.toFixed(1) : "—"}
                     </td>
-                    <td className="py-3.5 px-3 font-medium">
+                    <td className="py-3.5 px-3 font-bold">
                       {r.averages ? r.averages.organization.toFixed(1) : "—"}
                     </td>
                     <td className="py-3.5 px-3 whitespace-nowrap">
                       <div className="flex items-center gap-1.5">
-                        <span className="font-bold text-slate-900">
+                        <span className="font-extrabold text-slate-950 dark:text-white">
                           {r.averages ? r.averages.overall.toFixed(2) : "—"}
                         </span>
                         {r.overallDelta !== null && (
                           <span
-                            className={`inline-flex items-center gap-0.5 text-xs font-semibold ${
+                            className={`inline-flex items-center gap-0.5 text-xs font-extrabold ${
                               r.overallDelta > 0
-                                ? "text-emerald-600"
+                                ? "text-teal-600 dark:text-[#00f0d8]"
                                 : r.overallDelta < 0
-                                  ? "text-rose-600"
+                                  ? "text-rose-500"
                                   : "text-slate-400"
                             }`}
                           >
@@ -207,17 +214,17 @@ export default async function ComparePage() {
                     </td>
                     <td className="py-3.5 pl-3">
                       {r.fairness.reliable ? (
-                        <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">
+                        <span className="inline-flex items-center gap-1 text-xs font-extrabold text-teal-800 dark:text-[#00f0d8] bg-[#00e5cc]/20 px-2.5 py-0.5 rounded-full">
                           <CheckCircle2 className="w-3.5 h-3.5" />
-                          Reliable
+                          {t.compare.reliable}
                         </span>
                       ) : (
                         <span
                           title={r.fairness.reason}
-                          className="inline-flex items-center gap-1 text-xs font-medium text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full"
+                          className="inline-flex items-center gap-1 text-xs font-extrabold text-amber-800 dark:text-[#ffe600] bg-[#ffe600]/25 px-2.5 py-0.5 rounded-full"
                         >
                           <AlertCircle className="w-3.5 h-3.5" />
-                          {r.fairness.label}
+                          {t.compare.lowSample}
                         </span>
                       )}
                     </td>

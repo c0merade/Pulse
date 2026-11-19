@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { computeAverages, DropFlag } from "@/lib/analytics";
 import { getCurrentUser, getGroupScopeWhere } from "@/lib/auth";
+import { getServerLang } from "@/lib/i18n-server";
 import { AppShell } from "@/components/AppShell";
 import { SurveysClient } from "@/components/SurveysClient";
 
@@ -11,6 +12,7 @@ export default async function SurveysPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
+  const lang = await getServerLang();
   const aiMode = process.env.GEMINI_API_KEY?.trim() ? "GEMINI" : "FALLBACK";
   const groupScope = getGroupScopeWhere(user);
 
@@ -75,8 +77,8 @@ export default async function SurveysPage() {
   }));
 
   return (
-    <AppShell aiMode={aiMode} user={user}>
-      <SurveysClient surveys={serializedSurveys} groups={serializedGroups} />
+    <AppShell aiMode={aiMode} user={user} initialLang={lang}>
+      <SurveysClient surveys={serializedSurveys} groups={serializedGroups} lang={lang} />
     </AppShell>
   );
 }

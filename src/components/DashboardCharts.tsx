@@ -12,6 +12,7 @@ import {
   BarChart,
   Bar,
 } from "recharts";
+import type { Lang } from "@/lib/i18n";
 
 export interface TrendPoint {
   wave: string;
@@ -21,61 +22,89 @@ export interface TrendPoint {
   organization: number;
 }
 
-export function TrendLineChart({ data }: { data: TrendPoint[] }) {
+export function TrendLineChart({
+  data,
+  lang = "hy",
+}: {
+  data: TrendPoint[];
+  lang?: Lang;
+}) {
   if (data.length === 0) {
     return (
       <div className="h-64 flex items-center justify-center text-sm text-slate-400">
-        No survey trend data yet.
+        {lang === "hy" ? "Տրենդի տվյալներ դեռ չկան։" : "No survey trend data yet."}
       </div>
     );
   }
+
+  const labels =
+    lang === "hy"
+      ? {
+          lectures: "Դասախոսություններ",
+          practice: "Պրակտիկա",
+          materials: "Նյութեր",
+          organization: "Կազմակերպում",
+        }
+      : {
+          lectures: "Lectures",
+          practice: "Practice",
+          materials: "Materials",
+          organization: "Organization",
+        };
 
   return (
     <div className="h-72 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 10, right: 16, left: -12, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-          <XAxis dataKey="wave" tick={{ fontSize: 12, fill: "#475569" }} />
-          <YAxis domain={[1, 5]} ticks={[1, 2, 3, 4, 5]} tick={{ fontSize: 12, fill: "#475569" }} />
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.18)" />
+          <XAxis dataKey="wave" tick={{ fontSize: 12, fill: "#94a3b8", fontWeight: 600 }} />
+          <YAxis
+            domain={[1, 5]}
+            ticks={[1, 2, 3, 4, 5]}
+            tick={{ fontSize: 12, fill: "#94a3b8", fontWeight: 600 }}
+          />
           <Tooltip
             contentStyle={{
-              borderRadius: "10px",
-              border: "1px solid #e2e8f0",
+              backgroundColor: "#16191e",
+              borderRadius: "12px",
+              border: "1px solid rgba(0,229,204,0.35)",
+              color: "#f8fafc",
               fontSize: "12px",
+              fontWeight: 600,
             }}
           />
-          <Legend wrapperStyle={{ fontSize: "12px" }} />
+          <Legend wrapperStyle={{ fontSize: "12px", fontWeight: 600 }} />
           <Line
             type="monotone"
             dataKey="lectures"
-            name="Lectures"
-            stroke="#4f46e5"
-            strokeWidth={2.5}
-            dot={{ r: 4 }}
+            name={labels.lectures}
+            stroke="#00f0d8"
+            strokeWidth={3}
+            dot={{ r: 5, fill: "#00f0d8" }}
           />
           <Line
             type="monotone"
             dataKey="practice"
-            name="Practice"
-            stroke="#0ea5e9"
-            strokeWidth={2.5}
-            dot={{ r: 4 }}
+            name={labels.practice}
+            stroke="#ffe600"
+            strokeWidth={3}
+            dot={{ r: 5, fill: "#ffe600" }}
           />
           <Line
             type="monotone"
             dataKey="materials"
-            name="Materials"
-            stroke="#10b981"
+            name={labels.materials}
+            stroke="#34d399"
             strokeWidth={2.5}
-            dot={{ r: 4 }}
+            dot={{ r: 4, fill: "#34d399" }}
           />
           <Line
             type="monotone"
             dataKey="organization"
-            name="Organization"
-            stroke="#f59e0b"
+            name={labels.organization}
+            stroke="#38bdf8"
             strokeWidth={2.5}
-            dot={{ r: 4 }}
+            dot={{ r: 4, fill: "#38bdf8" }}
           />
         </LineChart>
       </ResponsiveContainer>
@@ -91,34 +120,62 @@ export interface GroupComparePoint {
   organization: number;
 }
 
-export function ComparisonBarChart({ data }: { data: GroupComparePoint[] }) {
+export function ComparisonBarChart({
+  data,
+  lang = "hy",
+}: {
+  data: GroupComparePoint[];
+  lang?: Lang;
+}) {
   if (data.length === 0) {
     return (
       <div className="h-64 flex items-center justify-center text-sm text-slate-400">
-        No comparison data available.
+        {lang === "hy" ? "Համեմատության տվյալներ չկան։" : "No comparison data available."}
       </div>
     );
   }
+
+  const labels =
+    lang === "hy"
+      ? {
+          lectures: "Դասախոսություններ",
+          practice: "Պրակտիկա",
+          materials: "Նյութեր",
+          organization: "Կազմակերպում",
+        }
+      : {
+          lectures: "Lectures",
+          practice: "Practice",
+          materials: "Materials",
+          organization: "Organization",
+        };
 
   return (
     <div className="h-72 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 10, right: 16, left: -12, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-          <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#475569" }} />
-          <YAxis domain={[0, 5]} ticks={[0, 1, 2, 3, 4, 5]} tick={{ fontSize: 12, fill: "#475569" }} />
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.18)" />
+          <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#94a3b8", fontWeight: 600 }} />
+          <YAxis
+            domain={[0, 5]}
+            ticks={[0, 1, 2, 3, 4, 5]}
+            tick={{ fontSize: 12, fill: "#94a3b8", fontWeight: 600 }}
+          />
           <Tooltip
             contentStyle={{
-              borderRadius: "10px",
-              border: "1px solid #e2e8f0",
+              backgroundColor: "#16191e",
+              borderRadius: "12px",
+              border: "1px solid rgba(0,229,204,0.35)",
+              color: "#f8fafc",
               fontSize: "12px",
+              fontWeight: 600,
             }}
           />
-          <Legend wrapperStyle={{ fontSize: "12px" }} />
-          <Bar dataKey="lectures" name="Lectures" fill="#4f46e5" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="practice" name="Practice" fill="#0ea5e9" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="materials" name="Materials" fill="#10b981" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="organization" name="Organization" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+          <Legend wrapperStyle={{ fontSize: "12px", fontWeight: 600 }} />
+          <Bar dataKey="lectures" name={labels.lectures} fill="#00f0d8" radius={[6, 6, 0, 0]} />
+          <Bar dataKey="practice" name={labels.practice} fill="#ffe600" radius={[6, 6, 0, 0]} />
+          <Bar dataKey="materials" name={labels.materials} fill="#34d399" radius={[6, 6, 0, 0]} />
+          <Bar dataKey="organization" name={labels.organization} fill="#38bdf8" radius={[6, 6, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

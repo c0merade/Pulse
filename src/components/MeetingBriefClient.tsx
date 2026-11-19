@@ -10,6 +10,7 @@ import {
   Printer,
   Sparkles,
 } from "lucide-react";
+import { DICT, Lang } from "@/lib/i18n";
 
 export interface BriefData {
   generatedAt: string;
@@ -53,7 +54,14 @@ export interface BriefData {
   }>;
 }
 
-export function MeetingBriefClient({ data }: { data: BriefData }) {
+export function MeetingBriefClient({
+  data,
+  lang = "hy",
+}: {
+  data: BriefData;
+  lang?: Lang;
+}) {
+  const t = DICT[lang];
   function buildMarkdown(): string {
     const lines: string[] = [
       `# Picsart Academy — Quality Sync Meeting Brief`,
@@ -156,55 +164,55 @@ export function MeetingBriefClient({ data }: { data: BriefData }) {
       {/* Header & Export Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 print:hidden">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Leadership Meeting Brief
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white">
+            {t.reports.title}
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Ready-to-present quality summary for the Edu Lead, Admin Lead, and Director sync.
+          <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mt-1">
+            {t.reports.subtitle}
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={handleDownloadCsv}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-700 text-xs font-medium hover:bg-slate-50 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white dark:bg-[#1e2229] border border-slate-300 dark:border-white/[0.12] text-slate-800 dark:text-white text-xs font-bold hover:border-[#00e5cc] cursor-pointer"
           >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
-            Issues CSV
+            <FileSpreadsheet className="w-4 h-4 text-teal-600 dark:text-[#00f0d8]" />
+            CSV
           </button>
           <button
             onClick={handleDownloadMarkdown}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-700 text-xs font-medium hover:bg-slate-50 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#ffe600] hover:bg-[#f5d800] text-slate-950 text-xs font-extrabold cursor-pointer"
           >
-            <Download className="w-4 h-4 text-indigo-600" />
+            <Download className="w-4 h-4" />
             Markdown (.md)
           </button>
           <button
             onClick={() => window.print()}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-indigo-600 text-white text-xs font-medium hover:bg-indigo-700 shadow-sm cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#00e5cc] hover:bg-[#00d4bd] text-slate-950 text-xs font-extrabold shadow-[0_0_20px_rgba(0,229,204,0.28)] cursor-pointer"
           >
             <Printer className="w-4 h-4" />
-            Print / Save PDF
+            {t.reports.printPdf}
           </button>
         </div>
       </div>
 
       {/* Printable Report Sheet */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-xs space-y-8 print:border-0 print:shadow-none print:p-0">
+      <div className="bento-card p-6 md:p-8 space-y-8 print:border-0 print:shadow-none print:p-0">
         {/* Report Title */}
-        <div className="border-b border-slate-200 pb-4 flex items-start justify-between gap-4">
+        <div className="border-b border-slate-200 dark:border-white/[0.08] pb-4 flex items-start justify-between gap-4">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-wider text-indigo-600 flex items-center gap-1.5">
+            <div className="text-xs font-extrabold uppercase tracking-wider text-teal-700 dark:text-[#00f0d8] flex items-center gap-1.5">
               <FileText className="w-3.5 h-3.5" />
-              Picsart Academy · Pulse Quality Report
+              {t.reports.reportBadge}
             </div>
-            <h2 className="text-xl font-bold text-slate-900 mt-1">
-              Academy Quality Sync Brief
+            <h2 className="text-xl font-extrabold text-slate-950 dark:text-white mt-1">
+              {t.reports.reportHeading}
             </h2>
           </div>
-          <div className="text-right text-xs text-slate-500">
-            <div>Generated</div>
-            <div className="font-medium text-slate-800">
+          <div className="text-right text-xs text-slate-500 dark:text-slate-400">
+            <div>{t.reports.generated}</div>
+            <div className="font-bold text-slate-900 dark:text-white">
               {new Date(data.generatedAt).toLocaleDateString()}
             </div>
           </div>

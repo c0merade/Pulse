@@ -13,7 +13,7 @@ import {
   TrendingDown,
   X,
 } from "lucide-react";
-import { CustomQuestion, SURVEY_TEMPLATES } from "@/lib/i18n";
+import { CustomQuestion, DICT, Lang, SURVEY_TEMPLATES } from "@/lib/i18n";
 
 interface GroupItem {
   id: string;
@@ -44,11 +44,14 @@ interface SurveyItem {
 export function SurveysClient({
   surveys,
   groups,
+  lang = "hy",
 }: {
   surveys: SurveyItem[];
   groups: GroupItem[];
+  lang?: Lang;
 }) {
   const router = useRouter();
+  const t = DICT[lang];
   const [showModal, setShowModal] = useState(false);
   const [creating, setCreating] = useState(false);
   const [runningReminders, setRunningReminders] = useState(false);
@@ -56,7 +59,7 @@ export function SurveysClient({
 
   const [form, setForm] = useState({
     groupId: groups[0]?.id ?? "",
-    title: "Monthly Pulse — Wave 4",
+    title: lang === "hy" ? "Ամսական Pulse — Ալիք 4" : "Monthly Pulse — Wave 4",
     targetResponseRate: 75,
     reminderIntervalHours: 24,
     scheduledAt: new Date().toISOString().slice(0, 10),
@@ -69,7 +72,7 @@ export function SurveysClient({
 
   function handleSelectTemplate(id: string) {
     setTemplateId(id);
-    const tpl = SURVEY_TEMPLATES.find((t) => t.id === id);
+    const tpl = SURVEY_TEMPLATES.find((item) => item.id === id);
     setCustomQuestions(tpl ? [...tpl.questions] : []);
   }
 
@@ -77,11 +80,7 @@ export function SurveysClient({
     if (newQuestionLabel.trim().length < 3) return;
     setCustomQuestions((prev) => [
       ...prev,
-      {
-        id: `q_${Date.now()}`,
-        label: newQuestionLabel.trim(),
-        type: newQuestionType,
-      },
+      { id: `q_${Date.now()}`, label: newQuestionLabel.trim(), type: newQuestionType },
     ]);
     setNewQuestionLabel("");
   }
@@ -120,12 +119,15 @@ export function SurveysClient({
         const s = data.summary;
         const skipped = s.details
           .filter((d: { skippedReason?: string }) => d.skippedReason)
-          .map((d: { groupName: string; skippedReason?: string }) => `${d.groupName}: ${d.skippedReason}`)
+          .map(
+            (d: { groupName: string; skippedReason?: string }) =>
+              `${d.groupName}: ${d.skippedReason}`
+          )
           .join(" · ");
         setReminderNotice(
-          `Sent ${s.remindersSent} reminder(s) across ${s.surveysChecked} active survey(s).${
-            skipped ? ` (${skipped})` : ""
-          }`
+          lang === "hy"
+            ? `Ուղարկվեց ${s.remindersSent} հիշեցում (${s.surveysChecked} ակտիվ հարցում)։${skipped ? ` (${skipped})` : ""}`
+            : `Sent ${s.remindersSent} reminder(s) across ${s.surveysChecked} active survey(s).${skipped ? ` (${skipped})` : ""}`
         );
         router.refresh();
       }
@@ -137,94 +139,92 @@ export function SurveysClient({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Surveys &amp; Automated Reminders
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white">
+            {t.surveys.title}
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Schedule recurring quality waves and chase responses automatically until target turnout is reached.
+          <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mt-1">
+            {t.surveys.subtitle}
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           <button
             onClick={handleRunReminders}
             disabled={runningReminders}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50 disabled:opacity-60 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#ffe600] hover:bg-[#f5d800] text-slate-950 text-sm font-extrabold disabled:opacity-60 transition-all shadow-[0_0_18px_rgba(255,230,0,0.22)] cursor-pointer"
           >
-            <Bell className="w-4 h-4 text-amber-500" />
-            {runningReminders ? "Sending..." : "Run Reminder Cycle"}
+            <Bell className="w-4 h-4 stroke-[2.5]" />
+            {runningReminders ? t.surveys.sending : t.surveys.runReminders}
           </button>
           <button
             onClick={() => setShowModal(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#00e5cc] hover:bg-[#00d4bd] text-slate-950 text-sm font-extrabold transition-all shadow-[0_0_20px_rgba(0,229,204,0.28)] cursor-pointer"
           >
-            <Plus className="w-4 h-4" />
-            Schedule Survey
+            <Plus className="w-4 h-4 stroke-[2.5]" />
+            {t.surveys.scheduleNew}
           </button>
         </div>
       </div>
 
       {reminderNotice && (
-        <div className="bg-indigo-50 border border-indigo-200 text-indigo-900 rounded-xl px-4 py-3 text-sm flex items-center justify-between gap-3">
+        <div className="bento-card border-[#00e5cc]/50 bg-[#00e5cc]/10 px-4 py-3 text-sm font-bold text-teal-900 dark:text-[#00f0d8] flex items-center justify-between gap-3">
           <span>{reminderNotice}</span>
-          <button
-            onClick={() => setReminderNotice(null)}
-            className="text-indigo-500 hover:text-indigo-700 cursor-pointer"
-          >
+          <button onClick={() => setReminderNotice(null)} className="cursor-pointer">
             <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
-      {/* Survey Cards */}
+      {/* Bento Survey Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {surveys.map((s) => {
           const targetMet = s.responseRate >= s.targetResponseRate;
+          const statusLabel = t.status[s.status as keyof typeof t.status] ?? s.status;
           return (
             <div
               key={s.id}
-              className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between gap-4"
+              className="bento-card p-6 flex flex-col justify-between gap-4 hover:border-[#00e5cc]/50 transition-all"
             >
               <div>
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-indigo-600">
+                      <span className="text-xs font-extrabold uppercase tracking-wider text-teal-700 dark:text-[#00f0d8]">
                         {s.group.name}
                       </span>
                       <span className="text-xs text-slate-400">·</span>
-                      <span className="text-xs text-slate-500">
+                      <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                         {s.group.lecturerName}
                       </span>
                     </div>
                     <Link
                       href={`/surveys/${s.id}`}
-                      className="text-base font-semibold text-slate-900 hover:text-indigo-600 mt-0.5 block"
+                      className="text-lg font-extrabold text-slate-950 dark:text-white hover:text-teal-600 dark:hover:text-[#00f0d8] mt-0.5 block"
                     >
                       {s.title}
                     </Link>
                   </div>
                   <span
-                    className={`px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0 ${
+                    className={`px-2.5 py-0.5 rounded-full text-xs font-extrabold shrink-0 ${
                       s.status === "ACTIVE"
-                        ? "bg-emerald-100 text-emerald-700"
+                        ? "bg-[#00e5cc]/20 text-teal-800 dark:text-[#00f0d8]"
                         : s.status === "SCHEDULED"
-                          ? "bg-sky-100 text-sky-700"
-                          : "bg-slate-100 text-slate-600"
+                          ? "bg-[#ffe600]/25 text-amber-800 dark:text-[#ffe600]"
+                          : "bg-slate-200 dark:bg-white/[0.08] text-slate-600 dark:text-slate-400"
                     }`}
                   >
-                    {s.status}
+                    {statusLabel}
                   </span>
                 </div>
 
                 {/* Progress bar */}
                 <div className="mt-4">
-                  <div className="flex items-center justify-between text-xs mb-1.5">
-                    <span className="text-slate-600">
-                      Turnout:{" "}
-                      <strong className="text-slate-900">
+                  <div className="flex items-center justify-between text-xs font-bold mb-1.5">
+                    <span className="text-slate-600 dark:text-slate-300">
+                      {t.surveys.turnout}:{" "}
+                      <strong className="text-slate-950 dark:text-white">
                         {s.respondedCount}/{s.totalInvites}
                       </strong>{" "}
                       ({s.responseRate}%)
@@ -232,19 +232,21 @@ export function SurveysClient({
                     <span
                       className={
                         targetMet
-                          ? "text-emerald-600 font-medium"
-                          : "text-amber-600 font-medium"
+                          ? "text-teal-700 dark:text-[#00f0d8]"
+                          : "text-amber-600 dark:text-[#ffe600]"
                       }
                     >
                       {targetMet
-                        ? `Target ${s.targetResponseRate}% reached`
-                        : `Target: ${s.targetResponseRate}%`}
+                        ? `${s.targetResponseRate}% ${t.surveys.targetReached}`
+                        : `${t.surveys.target}: ${s.targetResponseRate}%`}
                     </span>
                   </div>
-                  <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="w-full h-2.5 bg-slate-200 dark:bg-white/[0.08] rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full ${
-                        targetMet ? "bg-emerald-500" : "bg-indigo-500"
+                        targetMet
+                          ? "bg-[#00e5cc] shadow-[0_0_12px_rgba(0,229,204,0.45)]"
+                          : "bg-[#ffe600]"
                       }`}
                       style={{ width: `${s.responseRate}%` }}
                     />
@@ -252,45 +254,45 @@ export function SurveysClient({
                 </div>
 
                 {/* Meta badges */}
-                <div className="mt-3.5 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                  <span className="inline-flex items-center gap-1">
+                <div className="mt-4 flex flex-wrap items-center gap-2 text-xs font-bold">
+                  <span className="inline-flex items-center gap-1 text-slate-500 dark:text-slate-400">
                     <Calendar className="w-3.5 h-3.5" />
-                    Closes {new Date(s.closesAt).toLocaleDateString()}
+                    {t.surveys.closes} {new Date(s.closesAt).toLocaleDateString()}
                   </span>
                   {s.overallScore > 0 && (
-                    <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">
-                      Avg {s.overallScore.toFixed(1)}/5
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-white/[0.08] text-slate-800 dark:text-white">
+                      {t.surveys.avg} {s.overallScore.toFixed(1)}/5
                     </span>
                   )}
                   {s.hasAnalysis && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-medium">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#00e5cc]/15 text-teal-800 dark:text-[#00f0d8]">
                       <Sparkles className="w-3 h-3" />
-                      AI Summarized
+                      {t.surveys.aiSummarized}
                     </span>
                   )}
                   {s.dropsCount > 0 && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-rose-50 text-rose-700 font-medium">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-500/15 text-rose-600 dark:text-rose-400">
                       <TrendingDown className="w-3 h-3" />
-                      {s.dropsCount} drop flag{s.dropsCount > 1 ? "s" : ""}
+                      {s.dropsCount} {t.surveys.dropFlag}
                     </span>
                   )}
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+              <div className="pt-3.5 border-t border-slate-100 dark:border-white/[0.06] flex items-center justify-between gap-2">
                 <Link
                   href={`/surveys/${s.id}`}
-                  className="text-sm font-medium text-indigo-600 hover:text-indigo-800"
+                  className="text-sm font-extrabold text-teal-700 dark:text-[#00f0d8] hover:underline"
                 >
-                  View AI Summary &amp; Details →
+                  {t.surveys.viewDetails} →
                 </Link>
                 {s.status === "ACTIVE" && s.samplePendingToken && (
                   <Link
                     href={`/s/${s.samplePendingToken}`}
                     target="_blank"
-                    className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 hover:text-slate-900 px-2.5 py-1 rounded-md border border-slate-200 hover:bg-slate-50"
+                    className="inline-flex items-center gap-1 text-xs font-bold text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/[0.1] hover:border-[#ffe600] hover:text-amber-600 dark:hover:text-[#ffe600] transition-colors"
                   >
-                    Demo Student Form <ExternalLink className="w-3 h-3" />
+                    {t.surveys.demoForm} <ExternalLink className="w-3 h-3" />
                   </Link>
                 )}
               </div>
@@ -301,28 +303,28 @@ export function SurveysClient({
 
       {/* Schedule Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 max-w-md w-full p-6 shadow-xl">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bento-card max-w-md w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-slate-900">
-                Schedule New Quality Survey
+              <h2 className="text-lg font-extrabold text-slate-950 dark:text-white">
+                {t.surveys.modalTitle}
               </h2>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-slate-400 hover:text-slate-600 cursor-pointer"
+                className="text-slate-400 hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
             <form onSubmit={handleCreateSurvey} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Group
+                <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">
+                  {t.surveys.group}
                 </label>
                 <select
                   value={form.groupId}
                   onChange={(e) => setForm({ ...form, groupId: e.target.value })}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  className="w-full rounded-xl border border-slate-300 dark:border-white/[0.12] bg-slate-50 dark:bg-[#1e2229] px-3 py-2 text-sm font-semibold text-slate-950 dark:text-white"
                   required
                 >
                   {groups.map((g) => (
@@ -333,21 +335,21 @@ export function SurveysClient({
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Survey Title
+                <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">
+                  {t.surveys.surveyTitle}
                 </label>
                 <input
                   type="text"
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  className="w-full rounded-xl border border-slate-300 dark:border-white/[0.12] bg-slate-50 dark:bg-[#1e2229] px-3 py-2 text-sm font-semibold text-slate-950 dark:text-white"
                   required
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Starts On
+                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">
+                    {t.surveys.startsOn}
                   </label>
                   <input
                     type="date"
@@ -355,27 +357,27 @@ export function SurveysClient({
                     onChange={(e) =>
                       setForm({ ...form, scheduledAt: e.target.value })
                     }
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    className="w-full rounded-xl border border-slate-300 dark:border-white/[0.12] bg-slate-50 dark:bg-[#1e2229] px-3 py-2 text-sm font-semibold text-slate-950 dark:text-white"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Closes On
+                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">
+                    {t.surveys.closesOn}
                   </label>
                   <input
                     type="date"
                     value={form.closesAt}
                     onChange={(e) => setForm({ ...form, closesAt: e.target.value })}
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    className="w-full rounded-xl border border-slate-300 dark:border-white/[0.12] bg-slate-50 dark:bg-[#1e2229] px-3 py-2 text-sm font-semibold text-slate-950 dark:text-white"
                     required
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Target Turnout (%)
+                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">
+                    {t.surveys.targetPct}
                   </label>
                   <input
                     type="number"
@@ -388,12 +390,12 @@ export function SurveysClient({
                         targetResponseRate: Number(e.target.value),
                       })
                     }
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    className="w-full rounded-xl border border-slate-300 dark:border-white/[0.12] bg-slate-50 dark:bg-[#1e2229] px-3 py-2 text-sm font-semibold text-slate-950 dark:text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Reminder Every (hrs)
+                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">
+                    {t.surveys.reminderHrs}
                   </label>
                   <input
                     type="number"
@@ -406,23 +408,24 @@ export function SurveysClient({
                         reminderIntervalHours: Number(e.target.value),
                       })
                     }
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    className="w-full rounded-xl border border-slate-300 dark:border-white/[0.12] bg-slate-50 dark:bg-[#1e2229] px-3 py-2 text-sm font-semibold text-slate-950 dark:text-white"
                   />
                 </div>
               </div>
-              <div className="pt-2 border-t border-slate-100 space-y-2.5">
+
+              <div className="pt-2 border-t border-slate-200 dark:border-white/[0.08] space-y-2.5">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
-                    Survey Template
+                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">
+                    {t.surveys.template}
                   </label>
                   <select
                     value={templateId}
                     onChange={(e) => handleSelectTemplate(e.target.value)}
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs bg-white"
+                    className="w-full rounded-xl border border-slate-300 dark:border-white/[0.12] bg-slate-50 dark:bg-[#1e2229] px-3 py-2 text-xs font-semibold text-slate-950 dark:text-white"
                   >
                     {SURVEY_TEMPLATES.map((tpl) => (
                       <option key={tpl.id} value={tpl.id}>
-                        {tpl.name}
+                        {lang === "hy" ? tpl.nameHy : tpl.name}
                       </option>
                     ))}
                   </select>
@@ -433,10 +436,10 @@ export function SurveysClient({
                     {customQuestions.map((q) => (
                       <div
                         key={q.id}
-                        className="flex items-center justify-between gap-2 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs"
+                        className="flex items-center justify-between gap-2 bento-inner px-3 py-1.5 text-xs"
                       >
-                        <span className="truncate text-slate-700">
-                          <strong className="text-indigo-600 mr-1">
+                        <span className="truncate text-slate-700 dark:text-slate-200 font-semibold">
+                          <strong className="text-teal-600 dark:text-[#00f0d8] mr-1">
                             [{q.type === "RATING" ? "1-5" : "Text"}]
                           </strong>
                           {q.label}
@@ -448,7 +451,7 @@ export function SurveysClient({
                               prev.filter((item) => item.id !== q.id)
                             )
                           }
-                          className="text-slate-400 hover:text-rose-600 cursor-pointer shrink-0"
+                          className="text-slate-400 hover:text-rose-500 cursor-pointer shrink-0"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -460,17 +463,17 @@ export function SurveysClient({
                 <div className="flex gap-1.5">
                   <input
                     type="text"
-                    placeholder="Add custom question (optional)..."
+                    placeholder={t.surveys.addQuestionPlaceholder}
                     value={newQuestionLabel}
                     onChange={(e) => setNewQuestionLabel(e.target.value)}
-                    className="flex-1 rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs"
+                    className="flex-1 rounded-xl border border-slate-300 dark:border-white/[0.12] bg-slate-50 dark:bg-[#1e2229] px-2.5 py-1.5 text-xs text-slate-950 dark:text-white"
                   />
                   <select
                     value={newQuestionType}
                     onChange={(e) =>
                       setNewQuestionType(e.target.value as "RATING" | "TEXT")
                     }
-                    className="rounded-lg border border-slate-300 px-2 py-1.5 text-xs bg-white"
+                    className="rounded-xl border border-slate-300 dark:border-white/[0.12] bg-slate-50 dark:bg-[#1e2229] px-2 py-1.5 text-xs text-slate-950 dark:text-white"
                   >
                     <option value="RATING">1–5</option>
                     <option value="TEXT">Text</option>
@@ -478,9 +481,9 @@ export function SurveysClient({
                   <button
                     type="button"
                     onClick={handleAddCustomQuestion}
-                    className="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-[#ffe600] text-slate-950 text-xs font-extrabold cursor-pointer"
                   >
-                    + Add
+                    {t.surveys.addBtn}
                   </button>
                 </div>
               </div>
@@ -489,16 +492,16 @@ export function SurveysClient({
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 rounded-lg border border-slate-300 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"
+                  className="px-4 py-2 rounded-xl border border-slate-300 dark:border-white/[0.12] text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer"
                 >
-                  Cancel
+                  {t.surveys.cancel}
                 </button>
                 <button
                   type="submit"
                   disabled={creating}
-                  className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 disabled:opacity-60 cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-[#00e5cc] hover:bg-[#00d4bd] text-slate-950 text-sm font-extrabold disabled:opacity-60 cursor-pointer"
                 >
-                  {creating ? "Scheduling..." : "Create & Generate Invites"}
+                  {creating ? t.surveys.creating : t.surveys.createBtn}
                 </button>
               </div>
             </form>
