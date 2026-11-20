@@ -87,6 +87,32 @@ body {
   color: var(--yellow-text);
 }
 
+.pulse-thead {
+  background: var(--surface-elevated);
+  border-bottom: 1px solid var(--border);
+}
+
+.pulse-row {
+  background: transparent;
+  transition: background-color 150ms ease;
+}
+
+.pulse-row:nth-child(even) {
+  background: rgba(148, 163, 184, 0.04);
+}
+
+html.dark .pulse-row:nth-child(even) {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.pulse-row:hover {
+  background: rgba(0, 212, 189, 0.09) !important;
+}
+
+html.dark .pulse-row:hover {
+  background: rgba(0, 240, 216, 0.1) !important;
+}
+
 /* Guarantee crisp dark-mode contrast across all pages */
 html.dark .text-slate-950:not(.bg-\[\#00e5cc\]):not(.bg-\[\#ffe600\]),
 html.dark .text-slate-900:not(.bg-\[\#00e5cc\]):not(.bg-\[\#ffe600\]),

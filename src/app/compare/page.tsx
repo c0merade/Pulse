@@ -149,8 +149,8 @@ export default async function ComparePage() {
                     key={r.groupId}
                     className={
                       r.fairness.reliable
-                        ? "hover:bg-slate-50/70 dark:hover:bg-white/[0.03]"
-                        : "bg-amber-50/40 dark:bg-[#ffe600]/[0.04]"
+                        ? "pulse-row"
+                        : "pulse-row bg-[#ffe600]/[0.05]"
                     }
                   >
                     <td className="py-3.5 pr-4">

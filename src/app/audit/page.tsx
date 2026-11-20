@@ -43,19 +43,16 @@ export default async function AuditPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead>
-                  <tr className="border-b border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.03] text-xs font-bold uppercase text-slate-500 dark:text-slate-400">
+                  <tr className="pulse-thead text-xs font-bold uppercase text-muted">
                     <th className="py-3.5 px-4">{t.audit.colTime}</th>
                     <th className="py-3.5 px-4">{t.audit.colActor}</th>
                     <th className="py-3.5 px-4">{t.audit.colAction}</th>
                     <th className="py-3.5 px-4">{t.audit.colDetails}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-white/[0.06]">
+                <tbody className="divide-y divide-slate-100">
                   {logs.map((log) => (
-                    <tr
-                      key={log.id}
-                      className="hover:bg-slate-50/70 dark:hover:bg-white/[0.03]"
-                    >
+                    <tr key={log.id} className="pulse-row">
                       <td className="py-3 px-4 whitespace-nowrap text-xs font-semibold text-slate-500 dark:text-slate-400">
                         {new Date(log.createdAt).toLocaleString()}
                       </td>

@@ -405,10 +405,7 @@ export default async function DashboardPage() {
                   const statusLabel =
                     t.status[issue.status as keyof typeof t.status] ?? issue.status;
                   return (
-                    <tr
-                      key={issue.id}
-                      className="hover:bg-slate-50/70 dark:hover:bg-white/[0.03]"
-                    >
+                    <tr key={issue.id} className="pulse-row">
                       <td className="py-3.5 pr-4">
                         <div className="font-bold text-slate-950 dark:text-white">
                           {issue.title}
