@@ -91,13 +91,21 @@ export default async function ComparePage() {
   return (
     <AppShell aiMode={aiMode} user={user} initialLang={lang}>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white">
-            {t.compare.title}
-          </h1>
-          <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mt-1">
-            {t.compare.subtitle}
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white">
+              {t.compare.title}
+            </h1>
+            <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mt-1">
+              {t.compare.subtitle}
+            </p>
+          </div>
+          <Link
+            href="/reports"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#e000df] hover:bg-[#c400c3] text-white text-sm font-extrabold shadow-[0_0_20px_rgba(224,0,223,0.3)] self-start"
+          >
+            {t.nav.reports} →
+          </Link>
         </div>
 
         {/* Fairness Guardrail Banner */}
@@ -171,7 +179,8 @@ export default async function ComparePage() {
                       </div>
                     </td>
                     <td className="py-3.5 px-3 whitespace-nowrap text-xs font-bold text-slate-700 dark:text-slate-300">
-                      n={r.sampleSize}/{r.totalInvites} ({r.responseRate}%)
+                      {r.sampleSize} / {r.totalInvites}{" "}
+                      {lang === "hy" ? "ուսանող" : "students"} ({r.responseRate}%)
                     </td>
                     <td className="py-3.5 px-3 font-bold">
                       {r.averages ? r.averages.lectures.toFixed(1) : "—"}

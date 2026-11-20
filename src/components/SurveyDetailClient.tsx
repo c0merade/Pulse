@@ -481,7 +481,11 @@ export function SurveyDetailClient({ survey, lang = "hy" }: SurveyDetailProps) {
                     {isHy ? "Ընդհանուր ամփոփում" : "Executive Summary"}
                   </div>
                   <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-slate-100 text-muted font-bold">
-                    {isHy ? "Շարժիչ" : "Engine"}: {survey.analysis.source}
+                    {survey.analysis.source === "GEMINI"
+                      ? "Gemini AI"
+                      : isHy
+                        ? "Ավտոմատ AI ամփոփում"
+                        : "Automated AI Summary"}
                   </span>
                 </div>
                 <p className="text-sm font-medium text-slate-700 leading-relaxed">

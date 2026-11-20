@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { recordAuditLog, requireApiUser } from "@/lib/auth";
 import { updateIssueSchema } from "@/lib/validation";
+import { canVerifyIssue } from "@/domain/invariants";
 
 export async function PATCH(
   request: NextRequest,
@@ -23,6 +24,22 @@ export async function PATCH(
 
     const { status, ownerRole, ownerName, dueDate, verifiedBySurveyId } =
       parsed.data;
+
+    if (status === "VERIFIED" && verifiedBySurveyId) {
+      const existing = await prisma.issue.findUnique({
+        where: { id },
+        select: { sourceSurveyId: true },
+      });
+      if (existing) {
+        const check = canVerifyIssue({
+          sourceSurveyId: existing.sourceSurveyId,
+          verifyingSurveyId: verifiedBySurveyId,
+        });
+        if (!check.allowed) {
+          return NextResponse.json({ error: check.reason }, { status: 400 });
+        }
+      }
+    }
 
     const data: Record<string, unknown> = {};
     if (status) {
