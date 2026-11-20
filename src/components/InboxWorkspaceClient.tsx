@@ -6,14 +6,11 @@ import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
   Bell,
+  Check,
   CheckCircle2,
   ExternalLink,
   Plus,
-  PlusCircle,
-  Search,
   Sparkles,
-  TrendingDown,
-  TrendingUp,
   X,
 } from "lucide-react";
 import type { DropFlag, ScoreAverages, ThemeCluster } from "@/lib/analytics";
@@ -73,38 +70,16 @@ export function InboxWorkspaceClient({
   const isHy = lang === "hy";
   const t = DICT[lang];
 
-  const [selectedId, setSelectedId] = useState<string>(
-    cohorts[0]?.groupId ?? ""
-  );
-  const [filter, setFilter] = useState<"ALL" | "ATTENTION">("ALL");
-  const [query, setQuery] = useState("");
-  const [busyAction, setBusyAction] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string>(cohorts[0]?.groupId ?? "");
+  const [tab, setTab] = useState<"summary" | "issues" | "turnout">("summary");
+  const [busy, setBusy] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
-  const filteredCohorts = cohorts.filter((c) => {
-    const needsAttention =
-      (c.latestSurvey?.drops.length ?? 0) > 0 ||
-      c.issues.some((i) => i.isOverdue);
-    if (filter === "ATTENTION" && !needsAttention) return false;
-    if (query.trim()) {
-      const q = query.toLowerCase();
-      return (
-        c.groupName.toLowerCase().includes(q) ||
-        c.lecturerName.toLowerCase().includes(q) ||
-        c.courseName.toLowerCase().includes(q)
-      );
-    }
-    return true;
-  });
+  const selected = cohorts.find((c) => c.groupId === selectedId) ?? cohorts[0] ?? null;
+  const survey = selected?.latestSurvey ?? null;
 
-  const selected =
-    filteredCohorts.find((c) => c.groupId === selectedId) ??
-    filteredCohorts[0] ??
-    cohorts[0] ??
-    null;
-
-  async function handleRemindCohort(surveyId: string) {
-    setBusyAction("remind");
+  async function handleRemind(surveyId: string) {
+    setBusy("remind");
     setToast(null);
     try {
       const res = await fetch("/api/reminders/run", {
@@ -125,49 +100,41 @@ export function InboxWorkspaceClient({
         router.refresh();
       }
     } finally {
-      setBusyAction(null);
+      setBusy(null);
     }
   }
 
-  async function handleAnalyzeCohort(surveyId: string) {
-    setBusyAction("analyze");
+  async function handleAnalyze(surveyId: string) {
+    setBusy("analyze");
     setToast(null);
     try {
       const res = await fetch(`/api/surveys/${surveyId}/analyze`, {
         method: "POST",
       });
       if (res.ok) {
-        setToast(
-          isHy ? "AI ամփոփումը թարմացվեց։" : "AI summary updated."
-        );
+        setToast(isHy ? "Ամփոփումը թարմացվեց։" : "Summary updated.");
         router.refresh();
       }
     } finally {
-      setBusyAction(null);
+      setBusy(null);
     }
   }
 
-  async function handleQuickCreateIssue(
-    cohort: InboxCohortItem,
-    theme: ThemeCluster
-  ) {
+  async function handleAddIssue(cohort: InboxCohortItem, theme: ThemeCluster) {
     if (!cohort.latestSurvey) return;
-    setBusyAction(`issue-${theme.theme}`);
+    setBusy(`issue-${theme.theme}`);
     setToast(null);
     try {
-      const dueDate = new Date(Date.now() + 14 * 86400000)
-        .toISOString()
-        .slice(0, 10);
+      const dueDate = new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10);
       const res = await fetch("/api/issues", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: isHy ? `Լուծել՝ ${theme.theme}` : `Address: ${theme.theme}`,
+          title: isHy ? `Լուծել՝ ${theme.theme}` : `Fix: ${theme.theme}`,
           description: theme.summary,
           category: theme.category,
           severity: theme.severity,
-          ownerRole:
-            theme.category === "ORGANIZATION" ? "ADMIN_LEAD" : "EDU_LEAD",
+          ownerRole: theme.category === "ORGANIZATION" ? "ADMIN_LEAD" : "EDU_LEAD",
           dueDate,
           groupId: cohort.groupId,
           sourceSurveyId: cohort.latestSurvey.id,
@@ -175,40 +142,45 @@ export function InboxWorkspaceClient({
         }),
       });
       if (res.ok) {
-        setToast(
-          isHy
-            ? `«${theme.theme}» թեմայից ստեղծվեց նոր խնդիր։`
-            : `Created issue from "${theme.theme}".`
-        );
+        setToast(isHy ? "Ավելացվեց խնդիրների ցուցակում։" : "Added to issues list.");
+        setTab("issues");
         router.refresh();
       }
     } finally {
-      setBusyAction(null);
+      setBusy(null);
     }
   }
 
-  async function handleIssueStatus(issueId: string, status: string) {
-    const res = await fetch(`/api/issues/${issueId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        status,
-        ...(status === "VERIFIED" && selected?.latestSurvey
-          ? { verifiedBySurveyId: selected.latestSurvey.id }
-          : {}),
-      }),
-    });
-    if (res.ok) {
-      router.refresh();
+  async function handleAdvanceIssue(issueId: string, nextStatus: string) {
+    setBusy(issueId);
+    try {
+      const res = await fetch(`/api/issues/${issueId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          status: nextStatus,
+          ...(nextStatus === "VERIFIED" && survey
+            ? { verifiedBySurveyId: survey.id }
+            : {}),
+        }),
+      });
+      if (res.ok) {
+        router.refresh();
+      }
+    } finally {
+      setBusy(null);
     }
   }
 
-  const survey = selected?.latestSurvey ?? null;
+  const openCount =
+    selected?.issues.filter(
+      (i) => i.status === "OPEN" || i.status === "IN_PROGRESS"
+    ).length ?? 0;
 
   return (
-    <div className="space-y-4">
+    <div className="max-w-6xl mx-auto space-y-5">
       {toast && (
-        <div className="bento-card px-4 py-3 text-sm font-semibold text-primary flex items-center justify-between gap-2 border-[#d900d8]/40">
+        <div className="bento-card px-5 py-3.5 text-sm font-semibold text-primary flex items-center justify-between gap-2 border-[#d900d8]/40">
           <span>{toast}</span>
           <button onClick={() => setToast(null)} className="text-muted cursor-pointer">
             <X className="w-4 h-4" />
@@ -216,446 +188,439 @@ export function InboxWorkspaceClient({
         </div>
       )}
 
-      {/* Split Master-Detail Workspace */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-        {/* LEFT PANE: Cohort Inbox List (4 cols) */}
-        <aside className="lg:col-span-4 xl:col-span-3 bento-card overflow-hidden flex flex-col">
-          <div className="p-4 border-b border-[var(--border)] space-y-3">
-            <div className="flex items-center justify-between">
-              <h1 className="text-base font-bold text-primary">
-                {isHy ? "Խմբերի մուտքային" : "Quality Inbox"}
-              </h1>
-              {canManage && (
-                <Link
-                  href="/surveys"
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#d900d8] hover:bg-[#b800b7] text-white text-xs font-semibold"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  {isHy ? "Նոր" : "New"}
-                </Link>
-              )}
-            </div>
-
-            {/* Search */}
-            <div className="relative">
-              <Search className="w-3.5 h-3.5 text-muted absolute left-3 top-2.5" />
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={isHy ? "Որոնել խումբ կամ դասախոս..." : "Search group or lecturer..."}
-                className="w-full rounded-xl pulse-input pl-8 pr-3 py-1.5 text-xs font-medium focus:outline-none focus:border-[#d900d8]"
-              />
-            </div>
-
-            {/* Filter Pills */}
-            <div className="grid grid-cols-2 gap-1.5 text-xs font-semibold">
-              <button
-                type="button"
-                onClick={() => setFilter("ALL")}
-                className={`py-1.5 rounded-lg cursor-pointer transition-colors ${
-                  filter === "ALL"
-                    ? "bg-[#1d1d1f] text-white dark:bg-white dark:text-black"
-                    : "bg-[var(--surface-elevated)] text-muted hover:text-primary"
-                }`}
+      {/* Clean 2-Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* LEFT: Simple Group Picker */}
+        <aside className="lg:col-span-4 space-y-3">
+          <div className="flex items-center justify-between px-1">
+            <h1 className="text-lg font-bold text-primary">
+              {isHy ? "Խմբեր" : "Groups"}
+            </h1>
+            {canManage && (
+              <Link
+                href="/surveys"
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#d900d8] hover:bg-[#b800b7] text-white text-xs font-semibold"
               >
-                {isHy ? `Բոլորը (${cohorts.length})` : `All (${cohorts.length})`}
-              </button>
-              <button
-                type="button"
-                onClick={() => setFilter("ATTENTION")}
-                className={`py-1.5 rounded-lg cursor-pointer transition-colors ${
-                  filter === "ATTENTION"
-                    ? "bg-rose-600 text-white"
-                    : "bg-[var(--surface-elevated)] text-muted hover:text-primary"
-                }`}
-              >
-                {isHy ? "Ուշադրություն" : "Attention"}
-              </button>
-            </div>
+                <Plus className="w-3.5 h-3.5" />
+                {isHy ? "Նոր հարցում" : "New Survey"}
+              </Link>
+            )}
           </div>
 
-          {/* Cohort List Items */}
-          <div className="divide-y divide-[var(--border)]">
-            {filteredCohorts.length === 0 ? (
-              <div className="p-6 text-center text-xs text-muted">
-                {isHy ? "Խմբեր չգտնվեցին։" : "No matching cohorts."}
-              </div>
-            ) : (
-              filteredCohorts.map((c) => {
-                const isSelected = selected?.groupId === c.groupId;
-                const hasDrop = (c.latestSurvey?.drops.length ?? 0) > 0;
-                const hasOverdue = c.issues.some((i) => i.isOverdue);
-                const rate = c.latestSurvey?.responseRate ?? 0;
+          <div className="space-y-2.5">
+            {cohorts.map((c) => {
+              const isSelected = selected?.groupId === c.groupId;
+              const hasAlert =
+                (c.latestSurvey?.drops.length ?? 0) > 0 ||
+                c.issues.some((i) => i.isOverdue);
+              const score = c.latestSurvey?.averages.overall ?? 0;
 
-                return (
-                  <button
-                    key={c.groupId}
-                    type="button"
-                    onClick={() => setSelectedId(c.groupId)}
-                    className={`w-full text-left p-4 transition-colors cursor-pointer flex flex-col gap-2 ${
-                      isSelected
-                        ? "bg-[var(--accent-soft)] border-l-3 border-l-[#d900d8]"
-                        : "hover:bg-[var(--surface-elevated)]"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span
-                          className={`w-2 h-2 rounded-full shrink-0 ${
-                            hasDrop || hasOverdue
-                              ? "bg-rose-500"
-                              : "bg-emerald-500"
-                          }`}
-                        />
-                        <span className="font-bold text-sm text-primary truncate">
-                          {c.groupName}
+              return (
+                <button
+                  key={c.groupId}
+                  type="button"
+                  onClick={() => {
+                    setSelectedId(c.groupId);
+                    setTab("summary");
+                  }}
+                  className={`w-full text-left p-5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                    isSelected
+                      ? "bg-[var(--surface)] border-[#d900d8] shadow-md"
+                      : "bg-[var(--surface)]/70 border-[var(--border)] hover:bg-[var(--surface)]"
+                  }`}
+                >
+                  <div className="min-w-0">
+                    <div className="text-base font-bold text-primary">
+                      {c.groupName}
+                    </div>
+                    <div className="text-xs text-muted mt-0.5 truncate">
+                      {c.lecturerName}
+                    </div>
+                    <div className="mt-2">
+                      {hasAlert ? (
+                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-rose-600">
+                          <span className="w-2 h-2 rounded-full bg-rose-500" />
+                          {isHy ? "Ուշադրության կարիք ունի" : "Needs attention"}
                         </span>
-                      </div>
-                      <span className="text-xs font-bold text-primary shrink-0">
-                        {c.latestSurvey?.averages.overall
-                          ? `${c.latestSurvey.averages.overall.toFixed(1)}/5`
-                          : "—"}
-                      </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                          {isHy ? "Ամեն ինչ լավ է" : "All good"}
+                        </span>
+                      )}
                     </div>
+                  </div>
 
-                    <div className="text-xs text-muted truncate">
-                      {c.lecturerName} · {c.courseName}
+                  <div className="text-right shrink-0">
+                    <div className="text-2xl font-bold text-primary">
+                      {score > 0 ? score.toFixed(1) : "—"}
                     </div>
-
-                    <div className="flex items-center justify-between gap-2 pt-0.5">
-                      <div className="flex-1 h-1.5 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full rounded-full ${
-                            rate >= (c.latestSurvey?.targetResponseRate ?? 75)
-                              ? "bg-emerald-500"
-                              : "bg-[#d900d8]"
-                          }`}
-                          style={{ width: `${rate}%` }}
-                        />
-                      </div>
-                      <span className="text-[11px] font-semibold text-muted shrink-0">
-                        {rate}%
-                      </span>
-                    </div>
-
-                    {(hasDrop || hasOverdue) && (
-                      <div className="flex flex-wrap gap-1.5 pt-0.5">
-                        {hasDrop && (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-600">
-                            {isHy ? "Անկում" : "Score drop"}
-                          </span>
-                        )}
-                        {hasOverdue && (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-400">
-                            {isHy ? "Ուշացած խնդիր" : "Overdue issue"}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </button>
-                );
-              })
-            )}
+                    <div className="text-[11px] text-muted">/ 5.0</div>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </aside>
 
-        {/* RIGHT PANE: Instant Cohort Detail Workspace (8/9 cols) */}
-        <section className="lg:col-span-8 xl:col-span-9 space-y-5 min-w-0">
+        {/* RIGHT: One Calm Card With 3 Clear Tabs */}
+        <section className="lg:col-span-8">
           {!selected || !survey ? (
             <div className="bento-card p-12 text-center text-sm text-muted">
-              {isHy ? "Ընտրեք խումբ ձախ ցուցակից։" : "Select a cohort from the inbox."}
+              {isHy ? "Ընտրեք խումբ ձախից։" : "Pick a group on the left."}
             </div>
           ) : (
-            <>
-              {/* Cohort Header Card */}
-              <div className="bento-card p-6 space-y-5">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div>
-                    <div className="text-xs font-semibold text-muted">
-                      {selected.courseName} · {selected.lecturerName}
-                    </div>
-                    <h2 className="text-2xl font-bold text-primary mt-0.5">
-                      {selected.groupName}{" "}
-                      <span className="text-base font-medium text-muted">
-                        — {survey.title}
-                      </span>
-                    </h2>
-                  </div>
+            <div className="bento-card overflow-hidden">
+              {/* Calm Header */}
+              <div className="p-6 md:p-7 border-b border-[var(--border)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-2xl font-bold text-primary">
+                    {selected.groupName}
+                  </h2>
+                  <p className="text-sm text-muted mt-0.5">
+                    {selected.courseName} · {selected.lecturerName}
+                  </p>
+                </div>
 
-                  <div className="flex flex-wrap items-center gap-2">
-                    {canManage && survey.status === "ACTIVE" && (
-                      <button
-                        type="button"
-                        onClick={() => handleRemindCohort(survey.id)}
-                        disabled={busyAction !== null}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[var(--surface-elevated)] border border-[var(--border)] hover:border-[#d900d8] text-xs font-semibold text-primary cursor-pointer disabled:opacity-60"
-                      >
-                        <Bell className="w-3.5 h-3.5 text-[#d900d8]" />
-                        {busyAction === "remind"
-                          ? isHy
-                            ? "Ուղարկվում է..."
-                            : "Sending..."
-                          : isHy
-                            ? "Հիշեցնել"
-                            : "Remind"}
-                      </button>
-                    )}
+                <div className="flex items-center gap-2">
+                  {canManage && survey.responseRate < survey.targetResponseRate ? (
                     <button
                       type="button"
-                      onClick={() => handleAnalyzeCohort(survey.id)}
-                      disabled={busyAction !== null}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#d900d8] hover:bg-[#b800b7] text-white text-xs font-semibold cursor-pointer disabled:opacity-60"
+                      onClick={() => handleRemind(survey.id)}
+                      disabled={busy !== null}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#d900d8] hover:bg-[#b800b7] text-white text-sm font-semibold cursor-pointer disabled:opacity-60"
                     >
-                      <Sparkles className="w-3.5 h-3.5" />
-                      {busyAction === "analyze"
+                      <Bell className="w-4 h-4" />
+                      {busy === "remind"
                         ? isHy
-                          ? "Վերլուծվում է..."
-                          : "Analyzing..."
+                          ? "Ուղարկվում է..."
+                          : "Sending..."
                         : isHy
-                          ? "Թարմացնել AI"
-                          : "Refresh AI"}
+                          ? "Հիշեցնել ուսանողներին"
+                          : "Remind Students"}
                     </button>
-                    <Link
-                      href={`/surveys/${survey.id}`}
-                      className="inline-flex items-center gap-1 px-3 py-2 rounded-full border border-[var(--border)] text-xs font-semibold text-muted hover:text-primary"
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleAnalyze(survey.id)}
+                      disabled={busy !== null}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#d900d8] hover:bg-[#b800b7] text-white text-sm font-semibold cursor-pointer disabled:opacity-60"
                     >
-                      {isHy ? "Ամբողջ էջ" : "Full View"}
-                      <ExternalLink className="w-3 h-3" />
-                    </Link>
-                  </div>
+                      <Sparkles className="w-4 h-4" />
+                      {busy === "analyze"
+                        ? isHy
+                          ? "Թարմացվում է..."
+                          : "Updating..."
+                        : isHy
+                          ? "Թարմացնել AI-ով"
+                          : "Update AI Summary"}
+                    </button>
+                  )}
                 </div>
+              </div>
 
-                {/* 4 Compact Dimension Scores */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {(
-                    [
-                      { k: "lectures" as const, label: t.categories.LECTURES },
-                      { k: "practice" as const, label: t.categories.PRACTICE },
-                      { k: "materials" as const, label: t.categories.MATERIALS },
-                      { k: "organization" as const, label: t.categories.ORGANIZATION },
-                    ] as const
-                  ).map((dim) => {
-                    const val = survey.averages[dim.k];
-                    const delta = survey.deltas[dim.k];
-                    const isDrop = delta !== null && delta <= -0.4;
-                    return (
-                      <div
-                        key={dim.k}
-                        className={`bento-inner p-3.5 ${
-                          isDrop ? "border-rose-500/50 bg-rose-500/[0.04]" : ""
-                        }`}
-                      >
-                        <div className="text-[11px] font-semibold text-muted">
-                          {dim.label}
-                        </div>
-                        <div className="mt-1 flex items-baseline justify-between">
-                          <span className="text-2xl font-bold text-primary">
-                            {val > 0 ? val.toFixed(1) : "—"}
-                          </span>
-                          {delta !== null && (
-                            <span
-                              className={`inline-flex items-center gap-0.5 text-xs font-bold ${
-                                isDrop
-                                  ? "text-rose-600"
-                                  : delta > 0
-                                    ? "text-emerald-600"
-                                    : "text-muted"
-                              }`}
-                            >
-                              {delta < 0 ? (
-                                <TrendingDown className="w-3 h-3" />
-                              ) : delta > 0 ? (
-                                <TrendingUp className="w-3 h-3" />
-                              ) : null}
-                              {delta > 0 ? `+${delta.toFixed(1)}` : delta.toFixed(1)}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Drop Alert Inside Detail */}
-                {survey.drops.length > 0 && (
-                  <div className="rounded-xl bg-rose-500/10 border border-rose-500/25 px-4 py-3 text-xs font-semibold text-rose-700 dark:text-rose-300 flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4 shrink-0" />
-                    <span>
-                      {isHy ? "Անկում նախորդ ալիքի համեմատ․ " : "Drop vs previous wave: "}
-                      {survey.drops
-                        .map(
-                          (d) =>
-                            `${d.label} (${d.previousScore.toFixed(1)} → ${d.currentScore.toFixed(1)})`
-                        )
-                        .join(", ")}
+              {/* 3 Simple Tabs */}
+              <div className="px-6 md:px-7 border-b border-[var(--border)] flex gap-6 text-sm font-semibold">
+                <button
+                  type="button"
+                  onClick={() => setTab("summary")}
+                  className={`py-3.5 border-b-2 transition-colors cursor-pointer ${
+                    tab === "summary"
+                      ? "border-[#d900d8] text-primary"
+                      : "border-transparent text-muted hover:text-primary"
+                  }`}
+                >
+                  {isHy ? "Ամփոփում" : "Summary"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTab("issues")}
+                  className={`py-3.5 border-b-2 transition-colors cursor-pointer ${
+                    tab === "issues"
+                      ? "border-[#d900d8] text-primary"
+                      : "border-transparent text-muted hover:text-primary"
+                  }`}
+                >
+                  {isHy ? "Խնդիրներ" : "Issues"}{" "}
+                  {openCount > 0 && (
+                    <span className="ml-1 px-2 py-0.5 rounded-full text-xs bg-rose-500/15 text-rose-600">
+                      {openCount}
                     </span>
-                  </div>
-                )}
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTab("turnout")}
+                  className={`py-3.5 border-b-2 transition-colors cursor-pointer ${
+                    tab === "turnout"
+                      ? "border-[#d900d8] text-primary"
+                      : "border-transparent text-muted hover:text-primary"
+                  }`}
+                >
+                  {isHy ? "Մասնակցություն" : "Turnout"} ({survey.respondedCount}/
+                  {survey.totalInvites})
+                </button>
               </div>
 
-              {/* AI Summary & Themes (Direct in Inbox!) */}
-              <div className="bento-card p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-base font-bold text-primary flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-[#d900d8]" />
-                    {isHy ? "AI ամփոփում և թեմաներ" : "AI Summary & Themes"}
-                  </h3>
-                  <span className="text-xs text-muted font-medium">
-                    {survey.respondedCount} / {survey.totalInvites}{" "}
-                    {isHy ? "ուսանող" : "students"} ({survey.responseRate}%)
-                  </span>
-                </div>
+              {/* Tab Content */}
+              <div className="p-6 md:p-7">
+                {/* TAB 1: SIMPLE SUMMARY */}
+                {tab === "summary" && (
+                  <div className="space-y-6">
+                    {/* Drop alert if any */}
+                    {survey.drops.length > 0 && (
+                      <div className="rounded-2xl bg-rose-500/10 border border-rose-500/25 p-4 flex items-center gap-3 text-sm font-semibold text-rose-700 dark:text-rose-300">
+                        <AlertTriangle className="w-5 h-5 shrink-0" />
+                        <span>
+                          {isHy ? "Գնահատականը իջել է․ " : "Score dropped: "}
+                          {survey.drops
+                            .map(
+                              (d) =>
+                                `${d.label} (${d.previousScore.toFixed(1)} → ${d.currentScore.toFixed(1)})`
+                            )
+                            .join(", ")}
+                        </span>
+                      </div>
+                    )}
 
-                {survey.analysis ? (
-                  <>
-                    <p className="text-sm text-primary leading-relaxed bento-inner p-4">
-                      {survey.analysis.overallSummary}
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {survey.analysis.themes.map((th, idx) => (
-                        <div
-                          key={idx}
-                          className="bento-inner p-4 flex flex-col justify-between gap-3"
-                        >
-                          <div className="space-y-1.5">
-                            <div className="flex items-center justify-between gap-2">
-                              <span
-                                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                                  th.sentiment === "NEGATIVE"
-                                    ? "bg-rose-500/15 text-rose-600"
-                                    : th.sentiment === "POSITIVE"
-                                      ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
-                                      : "bg-slate-200 text-muted"
-                                }`}
-                              >
-                                {th.count} {isHy ? "հիշատակում" : "mentions"}
-                              </span>
-                              <span className="text-[10px] font-semibold text-muted">
-                                {t.categories[
-                                  th.category as keyof typeof t.categories
-                                ] ?? th.category}
-                              </span>
-                            </div>
-                            <div className="text-sm font-bold text-primary">
-                              {th.theme}
-                            </div>
-                            <p className="text-xs text-muted leading-relaxed">
-                              {th.summary}
-                            </p>
-                          </div>
-
-                          {canManage && (
-                            <button
-                              type="button"
-                              disabled={busyAction !== null}
-                              onClick={() => handleQuickCreateIssue(selected, th)}
-                              className="self-start inline-flex items-center gap-1 text-xs font-bold text-[#d900d8] hover:underline cursor-pointer disabled:opacity-50"
-                            >
-                              <PlusCircle className="w-3.5 h-3.5" />
-                              {isHy ? "Դարձնել խնդիր" : "Promote to Issue"}
-                            </button>
-                          )}
-                        </div>
-                      ))}
+                    {/* Plain AI Paragraph */}
+                    <div className="space-y-2">
+                      <div className="text-xs font-bold uppercase tracking-wider text-muted">
+                        {isHy ? "Ի՞նչ են ասում ուսանողները" : "What students are saying"}
+                      </div>
+                      <p className="text-base text-primary leading-relaxed">
+                        {survey.analysis?.overallSummary ||
+                          (isHy
+                            ? "Դեռ ամփոփում չկա։"
+                            : "No summary available yet.")}
+                      </p>
                     </div>
-                  </>
-                ) : (
-                  <p className="text-sm text-muted">
-                    {isHy
-                      ? "Սեղմեք «Թարմացնել AI»՝ մեկնաբանություններն ամփոփելու համար։"
-                      : "Click Refresh AI to summarize comments."}
-                  </p>
-                )}
-              </div>
 
-              {/* Cohort Issues with 1-Click Status */}
-              <div className="bento-card p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-base font-bold text-primary flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    {isHy ? "Այս խմբի խնդիրները" : "Cohort Issues"} (
-                    {selected.issues.length})
-                  </h3>
-                  <Link
-                    href="/issues"
-                    className="text-xs font-semibold text-[#d900d8] hover:underline"
-                  >
-                    {isHy ? "Բոլոր խնդիրները →" : "All issues →"}
-                  </Link>
-                </div>
-
-                {selected.issues.length === 0 ? (
-                  <p className="text-xs text-muted">
-                    {isHy
-                      ? "Այս խմբի համար գրանցված խնդիրներ չկան։"
-                      : "No tracked issues for this cohort."}
-                  </p>
-                ) : (
-                  <div className="space-y-2.5">
-                    {selected.issues.map((issue) => (
-                      <div
-                        key={issue.id}
-                        className="bento-inner p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                      >
-                        <div className="min-w-0">
-                          <div className="text-sm font-bold text-primary">
-                            {issue.title}
-                          </div>
-                          <div className="text-xs text-muted mt-0.5">
-                            {issue.ownerName} ·{" "}
-                            <span
-                              className={
-                                issue.isOverdue ? "text-rose-600 font-bold" : ""
-                              }
-                            >
-                              {new Date(issue.dueDate).toLocaleDateString()}
-                              {issue.isOverdue &&
-                                ` (${t.dashboard.overdueTag})`}
-                            </span>
-                          </div>
-                        </div>
-
-                        {canManage ? (
-                          <div className="inline-flex rounded-xl bg-[var(--surface)] border border-[var(--border)] p-0.5 gap-0.5 shrink-0">
-                            {(
-                              ["OPEN", "IN_PROGRESS", "RESOLVED", "VERIFIED"] as const
-                            ).map((st) => {
-                              const active = issue.status === st;
-                              return (
-                                <button
-                                  key={st}
-                                  type="button"
-                                  onClick={() => handleIssueStatus(issue.id, st)}
-                                  className={`px-2.5 py-1 rounded-lg text-[10px] font-bold cursor-pointer transition-colors ${
-                                    active
-                                      ? st === "VERIFIED"
-                                        ? "bg-emerald-600 text-white"
-                                        : st === "OPEN"
-                                          ? "bg-rose-600 text-white"
-                                          : st === "IN_PROGRESS"
-                                            ? "bg-amber-500 text-white"
-                                            : "bg-sky-600 text-white"
-                                      : "text-muted hover:text-primary"
+                    {/* 4 Simple Score Bars */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4 border-y border-[var(--border)]">
+                      {(
+                        [
+                          { k: "lectures" as const, label: t.categories.LECTURES },
+                          { k: "practice" as const, label: t.categories.PRACTICE },
+                          { k: "materials" as const, label: t.categories.MATERIALS },
+                          { k: "organization" as const, label: t.categories.ORGANIZATION },
+                        ] as const
+                      ).map((dim) => {
+                        const score = survey.averages[dim.k];
+                        const delta = survey.deltas[dim.k];
+                        return (
+                          <div key={dim.k} className="space-y-1">
+                            <div className="text-xs text-muted">{dim.label}</div>
+                            <div className="flex items-baseline gap-2">
+                              <span className="text-2xl font-bold text-primary">
+                                {score > 0 ? score.toFixed(1) : "—"}
+                              </span>
+                              {delta !== null && delta !== 0 && (
+                                <span
+                                  className={`text-xs font-bold ${
+                                    delta < 0 ? "text-rose-600" : "text-emerald-600"
                                   }`}
                                 >
-                                  {t.status[st]}
-                                </button>
-                              );
-                            })}
+                                  {delta > 0 ? `+${delta.toFixed(1)}` : delta.toFixed(1)}
+                                </span>
+                              )}
+                            </div>
                           </div>
-                        ) : (
-                          <span className="text-xs font-bold text-muted">
-                            {t.status[issue.status as keyof typeof t.status] ??
-                              issue.status}
-                          </span>
-                        )}
+                        );
+                      })}
+                    </div>
+
+                    {/* Top Themes — Ultra Clean List */}
+                    {survey.analysis && survey.analysis.themes.length > 0 && (
+                      <div className="space-y-3">
+                        <div className="text-xs font-bold uppercase tracking-wider text-muted">
+                          {isHy ? "Հիմնական թեմաները" : "Main themes"}
+                        </div>
+                        <div className="divide-y divide-[var(--border)]">
+                          {survey.analysis.themes.slice(0, 4).map((th, idx) => (
+                            <div
+                              key={idx}
+                              className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                            >
+                              <div className="space-y-0.5">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-bold text-primary">
+                                    {th.theme}
+                                  </span>
+                                  <span className="text-xs font-semibold text-muted">
+                                    · {th.count} {isHy ? "հոգի" : "mentions"}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-muted">{th.summary}</p>
+                              </div>
+                              {canManage && th.sentiment === "NEGATIVE" && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleAddIssue(selected, th)}
+                                  disabled={busy !== null}
+                                  className="self-start sm:self-center shrink-0 px-3.5 py-1.5 rounded-full border border-[#d900d8]/40 text-xs font-semibold text-[#b800b7] dark:text-[#f066ef] hover:bg-[#d900d8]/10 cursor-pointer"
+                                >
+                                  {isHy ? "+ Խնդիր սարքել" : "+ Track Issue"}
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    ))}
+                    )}
+                  </div>
+                )}
+
+                {/* TAB 2: SIMPLE ISSUES CHECKLIST */}
+                {tab === "issues" && (
+                  <div className="space-y-3">
+                    {selected.issues.length === 0 ? (
+                      <div className="py-8 text-center text-sm text-muted">
+                        {isHy
+                          ? "Այս խմբում բաց խնդիրներ չկան։"
+                          : "No issues for this group."}
+                      </div>
+                    ) : (
+                      selected.issues.map((issue) => {
+                        const isDone =
+                          issue.status === "RESOLVED" || issue.status === "VERIFIED";
+                        const nextAction =
+                          issue.status === "OPEN" || issue.status === "IN_PROGRESS"
+                            ? {
+                                status: "RESOLVED",
+                                label: isHy ? "Նշել լուծված" : "Mark Resolved",
+                              }
+                            : issue.status === "RESOLVED"
+                              ? {
+                                  status: "VERIFIED",
+                                  label: isHy ? "Հաստատել լուծումը" : "Verify Fix",
+                                }
+                              : null;
+
+                        return (
+                          <div
+                            key={issue.id}
+                            className="p-4 rounded-2xl bento-inner flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                          >
+                            <div className="flex items-start gap-3">
+                              <span
+                                className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
+                                  issue.status === "VERIFIED"
+                                    ? "bg-emerald-500 text-white"
+                                    : isDone
+                                      ? "bg-sky-500 text-white"
+                                      : "border-2 border-slate-300"
+                                }`}
+                              >
+                                {isDone && <Check className="w-3 h-3 stroke-[3]" />}
+                              </span>
+                              <div>
+                                <div className="text-sm font-bold text-primary">
+                                  {issue.title}
+                                </div>
+                                <div className="text-xs text-muted mt-0.5">
+                                  {issue.ownerName} ·{" "}
+                                  <span
+                                    className={
+                                      issue.isOverdue ? "text-rose-600 font-bold" : ""
+                                    }
+                                  >
+                                    {new Date(issue.dueDate).toLocaleDateString()}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {canManage && nextAction ? (
+                              <button
+                                type="button"
+                                disabled={busy === issue.id}
+                                onClick={() =>
+                                  handleAdvanceIssue(issue.id, nextAction.status)
+                                }
+                                className="self-start sm:self-center shrink-0 px-4 py-1.5 rounded-full bg-[#d900d8] hover:bg-[#b800b7] text-white text-xs font-semibold cursor-pointer disabled:opacity-60"
+                              >
+                                {nextAction.label}
+                              </button>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 shrink-0">
+                                <CheckCircle2 className="w-4 h-4" />
+                                {t.status[issue.status as keyof typeof t.status] ??
+                                  issue.status}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                )}
+
+                {/* TAB 3: SIMPLE TURNOUT */}
+                {tab === "turnout" && (
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <div className="flex items-baseline justify-between">
+                        <span className="text-3xl font-bold text-primary">
+                          {survey.responseRate}%
+                        </span>
+                        <span className="text-sm text-muted">
+                          {survey.respondedCount} / {survey.totalInvites}{" "}
+                          {isHy ? "ուսանող պատասխանել է" : "students responded"}
+                        </span>
+                      </div>
+                      <div className="w-full h-2.5 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${
+                            survey.responseRate >= survey.targetResponseRate
+                              ? "bg-emerald-500"
+                              : "bg-[#d900d8]"
+                          }`}
+                          style={{ width: `${survey.responseRate}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-muted">
+                        {isHy
+                          ? `Թիրախը՝ ${survey.targetResponseRate}%։ Հենց լրանա, հիշեցումներն ավտոմատ կկանգնեն։`
+                          : `Target: ${survey.targetResponseRate}%. Reminders stop automatically once reached.`}
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3">
+                      {canManage && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemind(survey.id)}
+                          disabled={busy !== null}
+                          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#d900d8] hover:bg-[#b800b7] text-white text-sm font-semibold cursor-pointer disabled:opacity-60"
+                        >
+                          <Bell className="w-4 h-4" />
+                          {isHy
+                            ? "Ուղարկել հիշեցում չպատասխանածներին"
+                            : "Remind Pending Students"}
+                        </button>
+                      )}
+                      {survey.samplePendingToken && (
+                        <Link
+                          href={`/s/${survey.samplePendingToken}`}
+                          target="_blank"
+                          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-[var(--border)] text-sm font-semibold text-primary hover:border-[#d900d8]"
+                        >
+                          {isHy ? "Բացել ուսանողի հարցաթերթիկը" : "Open Student Form"}
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </Link>
+                      )}
+                      <Link
+                        href={`/surveys/${survey.id}`}
+                        className="text-sm font-semibold text-muted hover:text-primary ml-auto"
+                      >
+                        {isHy ? "Ամբողջական մանրամասներ →" : "Full details →"}
+                      </Link>
+                    </div>
                   </div>
                 )}
               </div>
-            </>
+            </div>
           )}
         </section>
       </div>
