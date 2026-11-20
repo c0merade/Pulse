@@ -89,7 +89,7 @@ export function AppShell({
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-[var(--background)] text-[var(--foreground)] transition-colors duration-200">
       {/* Bento Sidebar */}
-      <aside className="w-full md:w-68 bg-[var(--surface)] border-b md:border-b-0 md:border-r border-[var(--border)] flex flex-col shrink-0 print:hidden">
+      <aside className="w-full md:w-68 md:sticky md:top-0 md:h-screen bg-[var(--surface)] border-b md:border-b-0 md:border-r border-[var(--border)] flex flex-col shrink-0 print:hidden">
         {/* Brand Header */}
         <div className="px-5 py-5 border-b border-[var(--border)] flex items-center justify-between gap-2">
           <div className="flex items-center gap-3">
