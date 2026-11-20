@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Lock, Moon, ShieldCheck, Sun, Zap } from "lucide-react";
+import { ArrowRight, Lock, Moon, Sun } from "lucide-react";
 import { DICT, Lang, LANG_COOKIE_NAME, normalizeLang } from "@/lib/i18n";
 import { PulseLogo } from "@/components/PulseLogo";
 
 export default function LoginPage() {
   const router = useRouter();
   const [lang, setLang] = useState<Lang>("hy");
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<"dark" | "light">("light");
   const [email, setEmail] = useState("edu@picsart.academy");
   const [password, setPassword] = useState("pulse123");
   const [error, setError] = useState<string | null>(null);
@@ -75,182 +75,118 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] flex items-center justify-center p-4 transition-colors">
-      <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 rounded-3xl border border-[var(--border)] bg-[var(--surface)] shadow-2xl overflow-hidden">
-        {/* Left Bento Brand Panel */}
-        <div className="bg-[#111418] text-white p-8 md:p-10 flex flex-col justify-between relative overflow-hidden">
-          <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-[#00e5cc]/15 blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -left-16 w-64 h-64 rounded-full bg-[#ffe600]/10 blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col items-center justify-center p-6 transition-colors">
+      {/* Top Minimal Controls */}
+      <div className="w-full max-w-md flex items-center justify-between mb-6">
+        <div className="flex items-center gap-2.5">
+          <PulseLogo className="w-8 h-8" />
+          <span className="font-bold text-base tracking-tight text-primary">
+            Pulse <span className="font-normal text-muted">· Picsart Academy</span>
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => switchLang(lang === "hy" ? "en" : "hy")}
+            className="px-2.5 py-1 rounded-full text-xs font-bold bg-[var(--surface)] border border-[var(--border)] text-primary cursor-pointer"
+          >
+            {lang === "hy" ? "ՀԱՅ" : "EN"}
+          </button>
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="p-2 rounded-full bg-[var(--surface)] border border-[var(--border)] text-primary cursor-pointer"
+          >
+            {theme === "dark" ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+          </button>
+        </div>
+      </div>
 
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <PulseLogo className="w-11 h-11 shrink-0 drop-shadow-[0_0_16px_rgba(85,255,240,0.32)]" />
-                <div>
-                  <div className="font-extrabold text-xl leading-tight tracking-tight">
-                    Pulse
-                  </div>
-                  <div className="text-xs font-bold uppercase tracking-wider text-[#ffe600]">
-                    Picsart Academy
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <div className="inline-flex rounded-xl bg-white/[0.07] p-0.5 text-[11px] font-bold">
-                  <button
-                    type="button"
-                    onClick={() => switchLang("hy")}
-                    className={`px-2.5 py-1 rounded-lg cursor-pointer ${
-                      lang === "hy" ? "bg-[#e000df] text-white" : "text-slate-300"
-                    }`}
-                  >
-                    ՀԱՅ
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => switchLang("en")}
-                    className={`px-2.5 py-1 rounded-lg cursor-pointer ${
-                      lang === "en" ? "bg-[#e000df] text-white" : "text-slate-300"
-                    }`}
-                  >
-                    ENG
-                  </button>
-                </div>
-                <button
-                  type="button"
-                  onClick={toggleTheme}
-                  className="p-2 rounded-xl bg-white/[0.07] text-[#ffe600] hover:bg-white/[0.14] cursor-pointer"
-                >
-                  {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-white">
-              {t.login.heroTitle}
-            </h1>
-            <p className="text-sm text-slate-300 mt-4 leading-relaxed font-medium">
-              {t.login.heroBody}
-            </p>
-
-            {/* Reference-inspired feature pills */}
-            <div className="flex flex-wrap gap-2 mt-6">
-              {[
-                lang === "hy" ? "AI թեմաների ամփոփում" : "AI Theme Summary",
-                lang === "hy" ? "Ավտոմատ հիշեցումներ" : "Smart Reminders",
-                lang === "hy" ? "Արդար համեմատություն" : "Fair Comparison",
-              ].map((pill) => (
-                <span
-                  key={pill}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-xs font-bold text-slate-200"
-                >
-                  <span className="w-4 h-4 rounded-full bg-[#ffe600] text-slate-950 flex items-center justify-center">
-                    <Zap className="w-2.5 h-2.5 fill-current" />
-                  </span>
-                  {pill}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="relative z-10 mt-8 pt-6 border-t border-white/[0.08] space-y-1.5 text-xs text-slate-400">
-            <div className="flex items-center gap-2 text-[#00f0d8] font-bold">
-              <ShieldCheck className="w-4 h-4" />
-              {t.login.rbacTitle}
-            </div>
-            <p>{t.login.rbacBody}</p>
-          </div>
+      {/* Centered Editorial Sign-In Card */}
+      <div className="w-full max-w-md bento-card p-8 md:p-9 space-y-6">
+        <div className="space-y-1.5">
+          <h1 className="text-2xl font-bold tracking-tight text-primary">
+            {t.login.title}
+          </h1>
+          <p className="text-sm text-muted">{t.login.subtitle}</p>
         </div>
 
-        {/* Right Sign-in Panel */}
-        <div className="p-8 md:p-10 flex flex-col justify-center bg-[var(--surface)]">
-          <h2 className="text-2xl font-extrabold text-primary tracking-tight">
-            {t.login.title}
-          </h2>
-          <p className="text-sm text-muted mt-1 font-medium">
-            {t.login.subtitle}
-          </p>
+        {error && (
+          <div className="rounded-xl bg-rose-500/10 border border-rose-500/30 px-4 py-3 text-sm font-medium text-rose-600">
+            {error}
+          </div>
+        )}
 
-          {error && (
-            <div className="mt-4 rounded-xl bg-rose-500/10 border border-rose-500/30 px-4 py-3 text-sm font-semibold text-rose-500">
-              {error}
-            </div>
-          )}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            doLogin(email, password);
+          }}
+          className="space-y-4"
+        >
+          <div>
+            <label className="block text-xs font-semibold text-muted mb-1.5">
+              {t.login.email}
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full rounded-xl pulse-input px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:border-[var(--accent)]"
+              required
+            />
+          </div>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              doLogin(email, password);
-            }}
-            className="mt-6 space-y-4"
-          >
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-muted mb-1.5">
-                {t.login.email}
-              </label>
+          <div>
+            <label className="block text-xs font-semibold text-muted mb-1.5">
+              {t.login.password}
+            </label>
+            <div className="relative">
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-xl pulse-input px-4 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#00e5cc]/50 focus:border-[#00e5cc]"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-xl pulse-input px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:border-[var(--accent)]"
                 required
               />
+              <Lock className="w-4 h-4 text-muted absolute right-3.5 top-3" />
             </div>
+          </div>
 
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-muted mb-1.5">
-                {t.login.password}
-              </label>
-              <div className="relative">
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-xl pulse-input px-4 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#00e5cc]/50 focus:border-[#00e5cc]"
-                  required
-                />
-                <Lock className="w-4 h-4 text-muted absolute right-3.5 top-3" />
-              </div>
-            </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3 rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-sm font-semibold disabled:opacity-60 transition-all flex items-center justify-center gap-2 cursor-pointer"
+          >
+            {loading ? t.login.submitting : t.login.submit}
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </form>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 rounded-xl bg-[#e000df] hover:bg-[#c400c3] text-white text-sm font-extrabold disabled:opacity-60 transition-all shadow-[0_0_22px_rgba(224,0,223,0.34)] flex items-center justify-center gap-2 cursor-pointer"
-            >
-              {loading ? t.login.submitting : t.login.submit}
-              <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-            </button>
-          </form>
-
-          {/* Quick Role Switcher */}
-          <div className="mt-7 pt-6 border-t border-[var(--border)]">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-muted mb-3">
-              {t.login.quickTitle}
-            </div>
-            <div className="grid grid-cols-2 gap-2.5">
-              {demoAccounts.map((acc) => (
-                <button
-                  key={acc.email}
-                  type="button"
-                  disabled={loading}
-                  onClick={() => {
-                    setEmail(acc.email);
-                    setPassword("pulse123");
-                    doLogin(acc.email, "pulse123");
-                  }}
-                  className="text-left p-3 rounded-xl bento-inner hover:border-[#00e5cc] hover:bg-[#00e5cc]/10 transition-all cursor-pointer"
-                >
-                  <div className="text-xs font-extrabold text-primary">
-                    {acc.label}
-                  </div>
-                  <div className="text-[11px] font-medium text-muted truncate mt-0.5">
-                    {acc.scope}
-                  </div>
-                </button>
-              ))}
-            </div>
+        {/* Quick Role Pills */}
+        <div className="pt-5 border-t border-[var(--border)] space-y-3">
+          <div className="text-[11px] font-semibold text-muted">
+            {t.login.quickTitle}
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {demoAccounts.map((acc) => (
+              <button
+                key={acc.email}
+                type="button"
+                disabled={loading}
+                onClick={() => {
+                  setEmail(acc.email);
+                  setPassword("pulse123");
+                  doLogin(acc.email, "pulse123");
+                }}
+                className="text-left p-3 rounded-xl bento-inner hover:border-[var(--accent)] transition-all cursor-pointer"
+              >
+                <div className="text-xs font-bold text-primary">{acc.label}</div>
+                <div className="text-[11px] text-muted truncate mt-0.5">
+                  {acc.scope}
+                </div>
+              </button>
+            ))}
           </div>
         </div>
       </div>

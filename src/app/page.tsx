@@ -1,13 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import {
-  AlertTriangle,
-  ArrowRight,
-  CheckCircle2,
-  Clock,
-  TrendingDown,
-  Users,
-} from "lucide-react";
+import { AlertTriangle, ArrowRight, Clock } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { computeAverages, detectDrops, DropFlag } from "@/lib/analytics";
 import { getCurrentUser, getGroupScopeWhere } from "@/lib/auth";
@@ -122,91 +115,107 @@ export default async function DashboardPage() {
     (i) => i.status === "OPEN" || i.status === "IN_PROGRESS"
   );
   const overdueIssues = openIssues.filter((i) => new Date(i.dueDate) < now);
+  const verifiedIssues = issues.filter((i) => i.status === "VERIFIED");
   const firstName = user.name.split(" ")[0];
+
+  const steps = isHy
+    ? [
+        { num: "01", title: "Հարցում", desc: "Ավտոմատ հիշեցումներ" },
+        { num: "02", title: "AI Ամփոփում", desc: "Թեմաներ և անկումներ" },
+        { num: "03", title: "Խնդիր", desc: "Պատասխանատու + ժամկետ" },
+        { num: "04", title: "Հաստատում", desc: "Ստուգում հաջորդ ալիքում" },
+      ]
+    : [
+        { num: "01", title: "Survey", desc: "Smart auto-reminders" },
+        { num: "02", title: "AI Summary", desc: "Themes & score drops" },
+        { num: "03", title: "Issue", desc: "Owner & due date" },
+        { num: "04", title: "Verified", desc: "Confirmed next wave" },
+      ];
 
   return (
     <AppShell aiMode={aiMode} user={user} initialLang={lang}>
-      <div className="space-y-8">
-        {/* Clean Friendly Greeting */}
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-primary">
-            {isHy ? `Բարի գալուստ, ${firstName}` : `Welcome back, ${firstName}`}
-          </h1>
-          <p className="text-sm font-medium text-muted mt-1">
-            {isHy
-              ? "Ամենակարևորը՝ մեկ էջում։ Սկսեք հարցում, ուղարկեք հիշեցում կամ ստուգեք խնդիրները։"
-              : "Everything important in one simple view. Start a survey, nudge students, or review open issues."}
-          </p>
-        </div>
+      <div className="space-y-10">
+        {/* Editorial Hero Header */}
+        <section className="space-y-5">
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-widest text-[var(--accent-text)]">
+              Picsart Academy · Pulse
+            </p>
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-primary">
+              {isHy ? `Բարի գալուստ, ${firstName}` : `Good day, ${firstName}`}
+            </h1>
+            <p className="text-base text-muted max-w-2xl leading-relaxed">
+              {isHy
+                ? "Ակադեմիայի ուսումնական որակի ամբողջ պատկերը՝ մեկ հանգիստ, ընթեռնելի էջում։"
+                : "Your Academy quality pulse in one calm, focused editorial overview."}
+            </p>
+          </div>
 
-        {/* 1-Click Quick Actions */}
-        <QuickActionsBar lang={lang} canManage={user.role !== "LECTURER"} />
+          <QuickActionsBar lang={lang} canManage={user.role !== "LECTURER"} />
+        </section>
 
-        {/* 3 Spacious, Crystal-Clear KPI Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-          <div className="bento-card p-6">
-            <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-muted">
+        {/* Big Airy Editorial Metrics */}
+        <section className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div className="bento-card p-7 space-y-2">
+            <div className="text-xs font-semibold text-muted">
               {t.dashboard.kpiTurnout}
-              <Users className="w-4 h-4 text-yellow-accent" />
             </div>
-            <div className="text-4xl font-extrabold text-primary mt-3">
+            <div className="text-5xl font-bold tracking-tight text-primary">
               {avgResponseRate}%
             </div>
-            <div className="text-xs font-semibold text-muted mt-1">
+            <div className="text-xs text-muted">
               {activeSurveys.length}{" "}
-              {isHy ? "ակտիվ հարցում հիմա" : "active surveys right now"}
+              {isHy ? "ակտիվ հարցում այս պահին" : "active surveys right now"}
             </div>
           </div>
 
-          <div className="bento-card p-6">
-            <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-muted">
+          <div className="bento-card p-7 space-y-2">
+            <div className="text-xs font-semibold text-muted">
               {t.dashboard.kpiDrops}
-              <TrendingDown className="w-4 h-4 text-rose-500" />
             </div>
             <div
-              className={`text-4xl font-extrabold mt-3 ${
-                flaggedDrops.length > 0 ? "text-rose-500" : "text-cyan-accent"
+              className={`text-5xl font-bold tracking-tight ${
+                flaggedDrops.length > 0 ? "text-rose-600" : "text-emerald-600"
               }`}
             >
               {flaggedDrops.length}
             </div>
-            <div className="text-xs font-semibold text-muted mt-1">
+            <div className="text-xs text-muted">
               {flaggedDrops.length > 0
                 ? isHy
                   ? "պահանջում է ուշադրություն"
-                  : "needs your attention"
+                  : "requires review"
                 : isHy
                   ? "բոլոր միավորները կայուն են"
-                  : "all scores are healthy"}
+                  : "all scores healthy"}
             </div>
           </div>
 
-          <div className="bento-card p-6">
-            <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-muted">
+          <div className="bento-card p-7 space-y-2">
+            <div className="text-xs font-semibold text-muted">
               {t.dashboard.kpiIssues}
-              <CheckCircle2 className="w-4 h-4 text-cyan-accent" />
             </div>
-            <div className="text-4xl font-extrabold text-primary mt-3">
+            <div className="text-5xl font-bold tracking-tight text-primary">
               {openIssues.length}
             </div>
-            <div className="text-xs font-semibold text-muted mt-1">
+            <div className="text-xs text-muted">
               {overdueIssues.length > 0 ? (
-                <span className="text-rose-500 font-bold">
+                <span className="text-rose-600 font-semibold">
                   {overdueIssues.length} {t.dashboard.kpiOverdue}
                 </span>
-              ) : isHy ? (
-                "ուշացած խնդիր չկա"
               ) : (
-                "none overdue"
+                <span className="text-emerald-600 font-semibold">
+                  {verifiedIssues.length} {t.dashboard.kpiVerified}
+                </span>
               )}
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Focused "Needs Your Attention" Section (only if there are drops or overdue issues) */}
+        {/* Needs Attention (Clean Editorial Callout) */}
         {(flaggedDrops.length > 0 || overdueIssues.length > 0) && (
-          <div className="bento-warn p-6 space-y-3">
-            <div className="flex items-center gap-2.5 text-sm font-extrabold text-yellow-accent">
+          <section className="bento-warn p-6 space-y-4">
+            <div className="flex items-center gap-2 text-sm font-bold text-amber-800 dark:text-amber-300">
               <AlertTriangle className="w-4 h-4" />
               {isHy ? "Ուշադրության կարիք ունի" : "Needs Your Attention"}
             </div>
@@ -216,17 +225,17 @@ export default async function DashboardPage() {
                 <Link
                   key={`drop-${idx}`}
                   href={`/surveys/${item.surveyId}`}
-                  className="flex items-center justify-between gap-3 bento-inner px-4 py-3.5 hover:border-[#ffe600] transition-colors"
+                  className="flex items-center justify-between gap-3 bg-[var(--surface)] border border-[var(--border)] rounded-2xl px-5 py-4 hover:border-[var(--accent)] transition-colors"
                 >
-                  <div className="text-sm font-bold text-primary">
-                    {item.groupName} — {item.drop.label}{" "}
-                    <span className="text-rose-500 font-extrabold ml-1">
-                      ({item.drop.previousScore.toFixed(1)} →{" "}
-                      {item.drop.currentScore.toFixed(1)})
+                  <div className="text-sm font-semibold text-primary">
+                    {item.groupName} — {item.drop.label}
+                    <span className="text-rose-600 font-bold ml-2">
+                      {item.drop.previousScore.toFixed(1)} →{" "}
+                      {item.drop.currentScore.toFixed(1)}
                     </span>
                   </div>
-                  <span className="text-xs font-extrabold text-cyan-accent inline-flex items-center gap-1 shrink-0">
-                    {isHy ? "Բացել" : "Inspect"} <ArrowRight className="w-3.5 h-3.5" />
+                  <span className="text-xs font-semibold text-[var(--accent-text)] inline-flex items-center gap-1 shrink-0">
+                    {isHy ? "Դիտել" : "Review"} <ArrowRight className="w-3.5 h-3.5" />
                   </span>
                 </Link>
               ))}
@@ -235,38 +244,38 @@ export default async function DashboardPage() {
                 <Link
                   key={issue.id}
                   href="/issues"
-                  className="flex items-center justify-between gap-3 bento-inner px-4 py-3.5 hover:border-rose-500/60 transition-colors"
+                  className="flex items-center justify-between gap-3 bg-[var(--surface)] border border-[var(--border)] rounded-2xl px-5 py-4 hover:border-rose-400 transition-colors"
                 >
-                  <div className="text-sm font-bold text-primary flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-rose-500 shrink-0" />
+                  <div className="text-sm font-semibold text-primary flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-rose-600 shrink-0" />
                     <span>
                       {issue.group.name}: {issue.title}
                     </span>
                   </div>
-                  <span className="text-xs font-extrabold text-rose-500 shrink-0">
+                  <span className="text-xs font-semibold text-rose-600 shrink-0">
                     {t.dashboard.overdueTag} →
                   </span>
                 </Link>
               ))}
             </div>
-          </div>
+          </section>
         )}
 
-        {/* Active Surveys — Clean, Simple Cards */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-extrabold text-primary">
+        {/* Active Surveys — Minimalist Cards */}
+        <section className="space-y-4">
+          <div className="flex items-baseline justify-between">
+            <h2 className="text-xl font-bold tracking-tight text-primary">
               {t.dashboard.activeSurveys}
             </h2>
             <Link
               href="/surveys"
-              className="text-xs font-extrabold text-cyan-accent hover:underline"
+              className="text-xs font-semibold text-[var(--accent-text)] hover:underline"
             >
               {t.dashboard.viewAll} →
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {activeSurveys.map((s) => {
               const total = s.invites.length;
               const done = s.invites.filter((i) => i.respondedAt !== null).length;
@@ -277,36 +286,36 @@ export default async function DashboardPage() {
                 <Link
                   key={s.id}
                   href={`/surveys/${s.id}`}
-                  className="bento-card p-5 hover:border-[#00f0d8] transition-all flex flex-col justify-between gap-4"
+                  className="bento-card p-6 hover:border-[var(--accent)] transition-all flex flex-col justify-between gap-5"
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-base font-extrabold text-primary">
+                  <div className="flex items-center justify-between">
+                    <span className="text-base font-bold text-primary">
                       {s.group.name}
                     </span>
                     <span
-                      className={`text-xs font-extrabold ${
-                        targetMet ? "text-cyan-accent" : "text-yellow-accent"
+                      className={`text-sm font-bold ${
+                        targetMet ? "text-emerald-600" : "text-amber-600"
                       }`}
                     >
                       {rate}%
                     </span>
                   </div>
 
-                  <div>
-                    <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                  <div className="space-y-2">
+                    <div className="w-full h-1.5 bg-[var(--surface-elevated)] rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full ${
-                          targetMet ? "bg-[#00e5cc]" : "bg-[#ffe600]"
+                          targetMet ? "bg-emerald-500" : "bg-[var(--accent)]"
                         }`}
                         style={{ width: `${rate}%` }}
                       />
                     </div>
-                    <div className="flex justify-between text-xs font-semibold text-muted mt-2">
+                    <div className="flex justify-between text-xs text-muted">
                       <span>
                         {done} / {total} {isHy ? "ուսանող" : "students"}
                       </span>
-                      <span className="text-cyan-accent font-bold">
-                        {isHy ? "Տեսնել →" : "Open →"}
+                      <span className="font-semibold text-primary">
+                        {isHy ? "Բացել →" : "Open →"}
                       </span>
                     </div>
                   </div>
@@ -314,30 +323,44 @@ export default async function DashboardPage() {
               );
             })}
           </div>
-        </div>
+        </section>
 
-        {/* Clean Score Trend Chart */}
-        <div className="bento-card p-6">
-          <div className="flex items-center justify-between mb-4">
+        {/* Trend Chart */}
+        <section className="bento-card p-7 space-y-5">
+          <div className="flex items-baseline justify-between gap-3">
             <div>
-              <h2 className="text-lg font-extrabold text-primary">
+              <h2 className="text-xl font-bold tracking-tight text-primary">
                 {t.dashboard.trendTitle}
               </h2>
-              <p className="text-xs font-medium text-muted">
-                {t.dashboard.trendSub}
-              </p>
+              <p className="text-xs text-muted mt-0.5">{t.dashboard.trendSub}</p>
             </div>
             {user.role !== "LECTURER" && (
               <Link
                 href="/compare"
-                className="text-xs font-extrabold text-cyan-accent hover:underline inline-flex items-center gap-1"
+                className="text-xs font-semibold text-[var(--accent-text)] hover:underline inline-flex items-center gap-1"
               >
                 {t.dashboard.compareGroups} <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             )}
           </div>
           <TrendLineChart data={trendData} lang={lang} />
-        </div>
+        </section>
+
+        {/* Editorial 4-Step Workflow Strip */}
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+          {steps.map((st) => (
+            <div
+              key={st.num}
+              className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]/70 p-4 space-y-1"
+            >
+              <div className="text-[11px] font-bold text-[var(--accent-text)]">
+                {st.num}
+              </div>
+              <div className="text-sm font-bold text-primary">{st.title}</div>
+              <div className="text-xs text-muted">{st.desc}</div>
+            </div>
+          ))}
+        </section>
       </div>
     </AppShell>
   );

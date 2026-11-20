@@ -31,7 +31,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const cookieStore = await cookies();
-  const theme = cookieStore.get("pulse_theme")?.value === "light" ? "light" : "dark";
+  // Apple / Editorial defaults to crisp Light Mode, with 1-click Dark Mode toggle
+  const theme = cookieStore.get("pulse_theme")?.value === "dark" ? "dark" : "light";
   const lang = cookieStore.get("pulse_lang")?.value === "en" ? "en" : "hy";
 
   return (

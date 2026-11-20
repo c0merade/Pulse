@@ -43,13 +43,13 @@ export function QuickActionsBar({
 
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <Link
           href="/surveys"
-          className="flex items-center justify-center gap-2.5 py-3.5 px-5 rounded-2xl bg-[#e000df] hover:bg-[#c400c3] text-white text-sm font-extrabold transition-all shadow-[0_0_20px_rgba(224,0,223,0.3)]"
+          className="inline-flex items-center gap-2 py-2.5 px-5 rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-sm font-semibold transition-all shadow-sm"
         >
-          <Plus className="w-4 h-4 stroke-[2.5]" />
-          {isHy ? "Նոր հարցում սկսել" : "Start New Survey"}
+          <Plus className="w-4 h-4" />
+          {isHy ? "Նոր հարցում" : "New Survey"}
         </Link>
 
         {canManage && (
@@ -57,9 +57,9 @@ export function QuickActionsBar({
             type="button"
             onClick={handleQuickRemind}
             disabled={sending}
-            className="flex items-center justify-center gap-2.5 py-3.5 px-5 rounded-2xl bg-[#ffe600] hover:bg-[#f5d800] text-slate-950 text-sm font-extrabold transition-all disabled:opacity-60 cursor-pointer"
+            className="inline-flex items-center gap-2 py-2.5 px-5 rounded-full bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--accent)] text-primary text-sm font-semibold transition-all disabled:opacity-60 cursor-pointer"
           >
-            <Bell className="w-4 h-4 stroke-[2.5]" />
+            <Bell className="w-4 h-4 text-[var(--accent-text)]" />
             {sending
               ? isHy
                 ? "Ուղարկվում է..."
@@ -73,18 +73,18 @@ export function QuickActionsBar({
         {canManage && (
           <Link
             href="/reports"
-            className="flex items-center justify-center gap-2.5 py-3.5 px-5 rounded-2xl bento-card hover:border-[#00f0d8] text-primary text-sm font-extrabold transition-all"
+            className="inline-flex items-center gap-2 py-2.5 px-5 rounded-full bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--accent)] text-primary text-sm font-semibold transition-all"
           >
-            <FileText className="w-4 h-4 text-cyan-accent" />
+            <FileText className="w-4 h-4 text-muted" />
             {isHy ? "Ժողովի ամփոփագիր" : "Meeting Brief"}
           </Link>
         )}
       </div>
 
       {notice && (
-        <div className="bento-inner border-[#00e5cc]/50 px-4 py-3 text-sm font-bold text-cyan-accent flex items-center justify-between gap-2">
+        <div className="bento-card px-4 py-3 text-sm font-medium text-primary flex items-center justify-between gap-2">
           <span>{notice}</span>
-          <button onClick={() => setNotice(null)} className="cursor-pointer">
+          <button onClick={() => setNotice(null)} className="text-muted hover:text-primary cursor-pointer">
             <X className="w-4 h-4" />
           </button>
         </div>
