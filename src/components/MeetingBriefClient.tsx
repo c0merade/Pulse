@@ -220,20 +220,20 @@ export function MeetingBriefClient({
 
         {/* KPI Strip */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-          <StatBox label="Active Surveys" value={String(data.stats.activeSurveys)} />
-          <StatBox label="Avg Turnout" value={`${data.stats.avgTurnout}%`} />
+          <StatBox label={t.dashboard.kpiActive} value={String(data.stats.activeSurveys)} />
+          <StatBox label={t.dashboard.kpiTurnout} value={`${data.stats.avgTurnout}%`} />
           <StatBox
-            label="Flagged Drops"
+            label={t.dashboard.kpiDrops}
             value={String(data.stats.flaggedDrops)}
             accent={data.stats.flaggedDrops > 0 ? "rose" : "emerald"}
           />
           <StatBox
-            label="Open / Overdue"
+            label={`${t.dashboard.kpiOpen} / ${t.dashboard.kpiOverdue}`}
             value={`${data.stats.openIssues} / ${data.stats.overdueIssues}`}
             accent={data.stats.overdueIssues > 0 ? "rose" : "slate"}
           />
           <StatBox
-            label="Verified Fixes"
+            label={t.dashboard.kpiVerified}
             value={String(data.stats.verifiedIssues)}
             accent="emerald"
           />
@@ -241,30 +241,30 @@ export function MeetingBriefClient({
 
         {/* Section 1: Score Drops */}
         <section className="space-y-3">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+          <h3 className="text-sm font-extrabold uppercase tracking-wider text-primary flex items-center gap-1.5">
             <AlertTriangle className="w-4 h-4 text-rose-500" />
-            1. Priority Score Drops (≥ 0.4 pts)
+            {t.reports.sec1}
           </h3>
           {data.drops.length === 0 ? (
-            <p className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3">
-              No score drops detected across the latest survey waves.
+            <p className="text-sm font-semibold text-cyan-accent bento-inner px-4 py-3">
+              {t.reports.noDrops}
             </p>
           ) : (
             <div className="space-y-2">
               {data.drops.map((d, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between bg-rose-50 border border-rose-200 rounded-lg px-4 py-3 text-sm"
+                  className="flex items-center justify-between bento-warn px-4 py-3 text-sm"
                 >
                   <div>
-                    <strong className="text-slate-900">
+                    <strong className="text-primary">
                       {d.groupName} — {d.dimension}
                     </strong>{" "}
-                    <span className="text-slate-600">({d.surveyTitle})</span>
+                    <span className="text-muted">({d.surveyTitle})</span>
                   </div>
-                  <div className="font-semibold text-rose-700">
+                  <div className="font-extrabold text-rose-500">
                     {d.previousScore.toFixed(1)} → {d.currentScore.toFixed(1)} (
-                    {d.delta.toFixed(2)} pts)
+                    {d.delta.toFixed(2)})
                   </div>
                 </div>
               ))}
@@ -274,40 +274,40 @@ export function MeetingBriefClient({
 
         {/* Section 2: Cohort AI Summaries */}
         <section className="space-y-3">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-            <Sparkles className="w-4 h-4 text-indigo-500" />
-            2. Cohort AI Summaries (Latest Wave)
+          <h3 className="text-sm font-extrabold uppercase tracking-wider text-primary flex items-center gap-1.5">
+            <Sparkles className="w-4 h-4 text-[#e000df]" />
+            {t.reports.sec2}
           </h3>
           <div className="space-y-3">
             {data.latestSummaries.map((s, idx) => (
               <div
                 key={idx}
-                className="rounded-xl border border-slate-200 p-4 space-y-2"
+                className="bento-inner p-4 space-y-2"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
-                    <span className="font-semibold text-slate-900">
+                    <span className="font-extrabold text-primary">
                       {s.groupName}
                     </span>
-                    <span className="text-xs text-slate-500 ml-2">
+                    <span className="text-xs text-muted ml-2">
                       {s.lecturerName} · {s.surveyTitle}
                     </span>
                   </div>
-                  <div className="text-xs font-semibold text-slate-700">
+                  <div className="text-xs font-extrabold text-cyan-accent">
                     {s.overallScore.toFixed(2)}/5 · n={s.sampleSize} ({s.responseRate}%)
                   </div>
                 </div>
-                <p className="text-sm text-slate-700 leading-relaxed">
+                <p className="text-sm font-medium text-primary leading-relaxed">
                   {s.summary}
                 </p>
                 {s.topNegativeThemes.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 pt-1">
-                    {s.topNegativeThemes.map((t, tIdx) => (
+                    {s.topNegativeThemes.map((th, tIdx) => (
                       <span
                         key={tIdx}
-                        className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-rose-100 text-rose-700"
+                        className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-rose-500/15 text-rose-500"
                       >
-                        {t.theme} ({t.count})
+                        {th.theme} ({th.count})
                       </span>
                     ))}
                   </div>
@@ -319,43 +319,43 @@ export function MeetingBriefClient({
 
         {/* Section 3: Owned Action Items */}
         <section className="space-y-3">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            3. Action Items &amp; Verification Tracker
+          <h3 className="text-sm font-extrabold uppercase tracking-wider text-primary flex items-center gap-1.5">
+            <CheckCircle2 className="w-4 h-4 text-cyan-accent" />
+            {t.reports.sec3}
           </h3>
           <div className="overflow-x-auto">
             <table className="w-full text-xs text-left">
               <thead>
-                <tr className="border-b border-slate-200 text-slate-500 uppercase">
-                  <th className="py-2 pr-3 font-medium">Issue</th>
-                  <th className="py-2 px-2 font-medium">Group</th>
-                  <th className="py-2 px-2 font-medium">Owner</th>
-                  <th className="py-2 px-2 font-medium">Due</th>
-                  <th className="py-2 pl-2 font-medium">Status</th>
+                <tr className="border-b border-[var(--border)] text-muted uppercase font-bold">
+                  <th className="py-2 pr-3">{t.dashboard.colIssue}</th>
+                  <th className="py-2 px-2">{t.dashboard.colGroup}</th>
+                  <th className="py-2 px-2">{t.dashboard.colOwner}</th>
+                  <th className="py-2 px-2">{t.dashboard.colDue}</th>
+                  <th className="py-2 pl-2">{t.dashboard.colStatus}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {data.issues.map((i) => (
                   <tr key={i.id}>
-                    <td className="py-2.5 pr-3 font-medium text-slate-900">
+                    <td className="py-2.5 pr-3 font-bold text-primary">
                       {i.title}
                     </td>
-                    <td className="py-2.5 px-2 text-slate-600">{i.groupName}</td>
-                    <td className="py-2.5 px-2 text-slate-600">{i.ownerName}</td>
+                    <td className="py-2.5 px-2 font-bold text-cyan-accent">{i.groupName}</td>
+                    <td className="py-2.5 px-2 text-muted">{i.ownerName}</td>
                     <td className="py-2.5 px-2 whitespace-nowrap">
                       <span
                         className={
                           i.isOverdue
-                            ? "text-rose-600 font-semibold inline-flex items-center gap-1"
-                            : "text-slate-600 inline-flex items-center gap-1"
+                            ? "text-rose-500 font-extrabold inline-flex items-center gap-1"
+                            : "text-muted inline-flex items-center gap-1"
                         }
                       >
                         <Clock className="w-3 h-3" />
                         {new Date(i.dueDate).toLocaleDateString()}
                       </span>
                     </td>
-                    <td className="py-2.5 pl-2 font-semibold text-slate-700">
-                      {i.status}
+                    <td className="py-2.5 pl-2 font-extrabold text-primary">
+                      {t.status[i.status as keyof typeof t.status] ?? i.status}
                     </td>
                   </tr>
                 ))}

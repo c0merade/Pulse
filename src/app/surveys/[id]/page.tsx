@@ -74,6 +74,7 @@ export default async function SurveyDetailPage({
   return (
     <AppShell aiMode={aiMode} user={user} initialLang={lang}>
       <SurveyDetailClient
+        lang={lang}
         survey={{
           id: survey.id,
           title: survey.title,

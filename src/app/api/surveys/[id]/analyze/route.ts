@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { computeAverages, detectDrops } from "@/lib/analytics";
 import { analyzeSurveyComments } from "@/lib/ai-analyzer";
 import { recordAuditLog, requireApiUser } from "@/lib/auth";
+import { getServerLang } from "@/lib/i18n-server";
 
 export async function POST(
   _request: NextRequest,
@@ -45,6 +46,7 @@ export async function POST(
     const prevAverages = prevSurvey ? computeAverages(prevSurvey.responses) : null;
     const drops = detectDrops(averages, prevAverages);
 
+    const lang = await getServerLang();
     const result = await analyzeSurveyComments({
       surveyTitle: survey.title,
       groupName: survey.group.name,
@@ -52,6 +54,7 @@ export async function POST(
       averages,
       drops,
       responses: survey.responses,
+      lang,
     });
 
     const saved = await prisma.surveyAnalysis.upsert({

@@ -23,14 +23,19 @@ export async function analyzeSurveyComments(params: {
   drops: DropFlag[];
   responses: CommentInput[];
   useFallbackOnly?: boolean;
+  lang?: "hy" | "en";
 }): Promise<AnalysisResult> {
+  const lang = params.lang ?? "hy";
   const commentsWithText = params.responses.filter(
     (r) => r.comment && r.comment.trim().length > 0
   );
 
   if (commentsWithText.length === 0) {
     return {
-      overallSummary: `Collected ${params.responses.length} numeric responses (overall ${params.averages.overall.toFixed(1)}/5) with no written comments yet.`,
+      overallSummary:
+        lang === "hy"
+          ? `Հավաքվել է ${params.responses.length} գնահատական (միջինը ${params.averages.overall.toFixed(1)}/5), գրավոր մեկնաբանություններ դեռ չկան։`
+          : `Collected ${params.responses.length} numeric responses (overall ${params.averages.overall.toFixed(1)}/5) with no written comments yet.`,
       themes: [],
       source: "FALLBACK",
     };
@@ -49,7 +54,7 @@ export async function analyzeSurveyComments(params: {
     );
     for (const modelName of candidates) {
       try {
-        return await runGeminiAnalysis(apiKey, modelName, params, commentsWithText);
+        return await runGeminiAnalysis(apiKey, modelName, { ...params, lang }, commentsWithText);
       } catch (err) {
         console.error(`[Pulse AI] Gemini (${modelName}) failed:`, err);
       }
@@ -57,7 +62,7 @@ export async function analyzeSurveyComments(params: {
     console.warn("[Pulse AI] All Gemini models unavailable, falling back to heuristic analyzer.");
   }
 
-  return runFallbackAnalysis(params, commentsWithText);
+  return runFallbackAnalysis({ ...params, lang }, commentsWithText);
 }
 
 async function runGeminiAnalysis(
@@ -69,13 +74,20 @@ async function runGeminiAnalysis(
     courseName: string;
     averages: ScoreAverages;
     drops: DropFlag[];
+    lang: "hy" | "en";
   },
   commentsWithText: CommentInput[]
 ): Promise<AnalysisResult> {
   const ai = new GoogleGenAI({ apiKey });
 
+  const langInstruction =
+    params.lang === "hy"
+      ? "IMPORTANT: Write overallSummary, every theme title, and every theme summary strictly in natural, clear Armenian (Հայերեն). Keep quotes verbatim in their original language."
+      : "Write overallSummary, every theme title, and every theme summary in clear English.";
+
   const prompt = [
-    `You are Pulse, an Academy quality-assurance analyst.`,
+    `You are Pulse, Picsart Academy's quality-assurance analyst.`,
+    langInstruction,
     `Analyze student survey responses for "${params.surveyTitle}" (Group: ${params.groupName}, Course: ${params.courseName}).`,
     `Average scores (1-5): Lectures ${params.averages.lectures}, Practice ${params.averages.practice}, Materials ${params.averages.materials}, Organization ${params.averages.organization} (Overall ${params.averages.overall}).`,
     params.drops.length > 0
@@ -161,50 +173,65 @@ async function runGeminiAnalysis(
 
 interface RuleDef {
   theme: string;
+  themeHy: string;
   category: "LECTURES" | "PRACTICE" | "MATERIALS" | "ORGANIZATION";
   keywords: RegExp;
   negativeHints: RegExp;
   positiveHints: RegExp;
   negSummary: string;
+  negSummaryHy: string;
   posSummary: string;
+  posSummaryHy: string;
 }
 
 const THEME_RULES: RuleDef[] = [
   {
     theme: "Practice Pacing & Hands-on Time",
+    themeHy: "Պրակտիկայի տեմպ և գործնական ժամանակ",
     category: "PRACTICE",
-    keywords: /\b(practice|lab|exercise|exercises|coding|workshop|hands-on|task|tasks|homework|debugging|mentor)\b/i,
-    negativeHints: /\b(rush|rushed|too fast|not enough|hard|difficult|stuck|little time|confused|need more|overwhelm|skip|missing)\b/i,
-    positiveHints: /\b(great|love|loved|helpful|awesome|good|clear|engaging|enjoy|better|improved|solid)\b/i,
+    keywords: /\b(practice|lab|exercise|exercises|coding|workshop|hands-on|task|tasks|homework|debugging|mentor)\b|պրակտիկ|առաջադրանք|մենթոր/i,
+    negativeHints: /\b(rush|rushed|too fast|not enough|hard|difficult|stuck|little time|confused|need more|overwhelm|skip|missing)\b|արագ|քիչ ժամանակ|բարդ/i,
+    positiveHints: /\b(great|love|loved|helpful|awesome|good|clear|engaging|enjoy|better|improved|solid)\b|լավ|գերազանց|օգտակար/i,
     negSummary: "Students report that practice sessions feel rushed or need more guided walkthrough time and mentor feedback.",
+    negSummaryHy: "Ուսանողները նշում են, որ պրակտիկ պարապմունքները շատ արագ են անցնում և ավելի շատ ուղղորդված ժամանակի կարիք կա։",
     posSummary: "Students appreciate the hands-on practice tasks and find the coding exercises engaging and practical.",
+    posSummaryHy: "Ուսանողները բարձր են գնահատում գործնական առաջադրանքներն ու կոդավորման վարժությունները։",
   },
   {
     theme: "Course Materials & Documentation",
+    themeHy: "Ուսումնական նյութեր և սլայդեր",
     category: "MATERIALS",
-    keywords: /\b(slide|slides|material|materials|doc|docs|pdf|recording|recordings|video|notes|repo|github|resource|resources|cheatsheet)\b/i,
-    negativeHints: /\b(outdated|late|broken|missing|hard to find|confusing|old|typo|unorganized|delay|delayed|upload)\b/i,
-    positiveHints: /\b(great|well-structured|clear|helpful|updated|clean|nice|useful|timely|good)\b/i,
+    keywords: /\b(slide|slides|material|materials|doc|docs|pdf|recording|recordings|video|notes|repo|github|resource|resources|cheatsheet)\b|սլայդ|նյութ|ձայնագր/i,
+    negativeHints: /\b(outdated|late|broken|missing|hard to find|confusing|old|typo|unorganized|delay|delayed|upload)\b|ուշ|հին|բացակայ/i,
+    positiveHints: /\b(great|well-structured|clear|helpful|updated|clean|nice|useful|timely|good)\b|լավ|հստակ|օգտակար/i,
     negSummary: "Materials, slides, or recordings are reported as outdated, uploaded late, or hard to navigate.",
+    negSummaryHy: "Սլայդերը, նյութերը կամ ձայնագրությունները նշվում են որպես ուշացած, հնացած կամ դժվար գտնելի։",
     posSummary: "Students find the slides, recordings, and reference materials well-organized and helpful for review.",
+    posSummaryHy: "Ուսանողները գոհ են սլայդերի, ձայնագրությունների և ուսումնական ռեսուրսների որակից։",
   },
   {
     theme: "Lecture Clarity & Delivery",
+    themeHy: "Դասախոսությունների հստակություն և մատուցում",
     category: "LECTURES",
-    keywords: /\b(lecture|lectures|lecturer|explain|explains|explanation|theory|pace|pacing|concept|concepts|class|classes|topic)\b/i,
-    negativeHints: /\b(fast|rushed|boring|unclear|confusing|dry|too much|skip|hard to follow|monotone|lost)\b/i,
-    positiveHints: /\b(clear|engaging|great|excellent|awesome|structured|easy to follow|love|insightful|patient|good)\b/i,
+    keywords: /\b(lecture|lectures|lecturer|explain|explains|explanation|theory|pace|pacing|concept|concepts|class|classes|topic)\b|դասախոս|բացատր|տեսությ/i,
+    negativeHints: /\b(fast|rushed|boring|unclear|confusing|dry|too much|skip|hard to follow|monotone|lost)\b|արագ|անհասկանալի|բարդ/i,
+    positiveHints: /\b(clear|engaging|great|excellent|awesome|structured|easy to follow|love|insightful|patient|good)\b|հստակ|լավ|հրաշալի/i,
     negSummary: "Some students struggle with lecture pacing or want clearer step-by-step explanations of complex concepts.",
+    negSummaryHy: "Որոշ ուսանողներ ցանկանում են ավելի հստակ և քայլ առ քայլ բացատրություններ բարդ թեմաների համար։",
     posSummary: "Lectures are praised for clear explanations, strong structure, and engaging real-world examples.",
+    posSummaryHy: "Դասախոսությունները գովաբանվում են հստակ բացատրությունների, լավ կառուցվածքի և իրական օրինակների համար։",
   },
   {
     theme: "Schedule, Communication & Logistics",
+    themeHy: "Ժամանակացույց, հաղորդակցություն և լոգիստիկա",
     category: "ORGANIZATION",
-    keywords: /\b(schedule|room|zoom|link|slack|calendar|admin|communication|deadline|deadlines|reschedule|late|wifi|audio|mic|organization)\b/i,
-    negativeHints: /\b(last minute|confusing|broken|late|noisy|bad|issue|problem|unclear|chaos|changed|delay|missing)\b/i,
-    positiveHints: /\b(smooth|clear|timely|organized|great|responsive|good|reliable)\b/i,
+    keywords: /\b(schedule|room|zoom|link|slack|calendar|admin|communication|deadline|deadlines|reschedule|late|wifi|audio|mic|organization)\b|ժամանակացույց|լսարան|հաղորդակց|ձայն/i,
+    negativeHints: /\b(last minute|confusing|broken|late|noisy|bad|issue|problem|unclear|chaos|changed|delay|missing)\b|ուշ|խնդիր|աղմկոտ/i,
+    positiveHints: /\b(smooth|clear|timely|organized|great|responsive|good|reliable)\b|հարթ|կազմակերպված|լավ/i,
     negSummary: "Students flagged friction around scheduling updates, communication timing, or room/call logistics.",
+    negSummaryHy: "Ուսանողները նշել են ժամանակացույցի ուշացած ծանուցումներ կամ լսարանային/տեխնիկական խնդիրներ։",
     posSummary: "Course scheduling, communication channels, and logistics are running smoothly.",
+    posSummaryHy: "Դասընթացի ժամանակացույցը, հաղորդակցությունը և կազմակերպչական մասը հարթ են ընթանում։",
   },
 ];
 
@@ -214,9 +241,11 @@ function runFallbackAnalysis(
     groupName: string;
     averages: ScoreAverages;
     drops: DropFlag[];
+    lang: "hy" | "en";
   },
   commentsWithText: CommentInput[]
 ): AnalysisResult {
+  const isHy = params.lang === "hy";
   const buckets = new Map<
     string,
     {
@@ -283,12 +312,18 @@ function runFallbackAnalysis(
           : "MEDIUM";
 
     themes.push({
-      theme: bucket.rule.theme,
+      theme: isHy ? bucket.rule.themeHy : bucket.rule.theme,
       category: bucket.rule.category,
       count: total,
       sentiment,
       severity,
-      summary: isNeg ? bucket.rule.negSummary : bucket.rule.posSummary,
+      summary: isNeg
+        ? isHy
+          ? bucket.rule.negSummaryHy
+          : bucket.rule.negSummary
+        : isHy
+          ? bucket.rule.posSummaryHy
+          : bucket.rule.posSummary,
       quotes: bucket.matches.slice(0, 3).map((m) => m.comment.trim()),
     });
   }
@@ -303,13 +338,16 @@ function runFallbackAnalysis(
         0
       ) / unmatched.length;
     themes.push({
-      theme: "General Course Sentiment",
+      theme: isHy ? "Ընդհանուր տպավորություն" : "General Course Sentiment",
       category: "ORGANIZATION",
       count: unmatched.length,
       sentiment: avgOverall >= 3.8 ? "POSITIVE" : avgOverall <= 3.0 ? "NEGATIVE" : "NEUTRAL",
       severity: avgOverall <= 3.0 ? "MEDIUM" : "LOW",
-      summary:
-        avgOverall >= 3.8
+      summary: isHy
+        ? avgOverall >= 3.8
+          ? "Ընդհանուր կարծիքները դրական են, ուսանողները գոհ են դասընթացի ընթացքից։"
+          : "Խառը ընդհանուր մեկնաբանություններ՝ փոքր բարելավման առաջարկներով։"
+        : avgOverall >= 3.8
           ? "General student feedback is upbeat and satisfied with overall course progression."
           : "Mixed general comments pointing to minor areas for improvement.",
       quotes: unmatched.slice(0, 2).map((m) => m.comment.trim()),
@@ -325,24 +363,45 @@ function runFallbackAnalysis(
   });
 
   const negativeThemes = themes.filter((t) => t.sentiment === "NEGATIVE");
-  const dropNote =
-    params.drops.length > 0
-      ? ` Attention needed: ${params.drops
-          .map((d) => `${d.label} dropped by ${Math.abs(d.delta).toFixed(1)} pts`)
-          .join(" and ")} compared to the previous wave.`
-      : " Scores are stable or improving relative to the previous wave.";
 
-  const themeNote =
-    negativeThemes.length > 0
-      ? ` Top concern${negativeThemes.length > 1 ? "s" : ""}: ${negativeThemes
-          .slice(0, 2)
-          .map((t) => `${t.theme} (${t.count} mentions)`)
-          .join(", ")}.`
-      : ` Feedback is broadly positive across ${themes.length} extracted themes.`;
+  let overallSummary: string;
+  if (isHy) {
+    const dropNote =
+      params.drops.length > 0
+        ? ` Ուշադրություն․ ${params.drops
+            .map((d) => `${d.label}-ը իջել է ${Math.abs(d.delta).toFixed(1)} միավորով`)
+            .join(" և ")} նախորդ ալիքի համեմատ։`
+        : " Գնահատականները կայուն են կամ բարելավվում են նախորդ ալիքի համեմատ։";
+    const themeNote =
+      negativeThemes.length > 0
+        ? ` Հիմնական խնդիրներ՝ ${negativeThemes
+            .slice(0, 2)
+            .map((t) => `${t.theme} (${t.count} հիշատակում)`)
+            .join(", ")}։`
+        : ` Կարծիքները հիմնականում դրական են (${themes.length} առանձնացված թեմա)։`;
+    overallSummary = `${params.groupName} խումբը հավաքել է ${params.averages.overall.toFixed(
+      1
+    )}/5 միջին (${params.averages.count} պատասխան)։${dropNote}${themeNote}`;
+  } else {
+    const dropNote =
+      params.drops.length > 0
+        ? ` Attention needed: ${params.drops
+            .map((d) => `${d.label} dropped by ${Math.abs(d.delta).toFixed(1)} pts`)
+            .join(" and ")} compared to the previous wave.`
+        : " Scores are stable or improving relative to the previous wave.";
 
-  const overallSummary = `${params.groupName} scored ${params.averages.overall.toFixed(
-    1
-  )}/5 across ${params.averages.count} responses.${dropNote}${themeNote}`;
+    const themeNote =
+      negativeThemes.length > 0
+        ? ` Top concern${negativeThemes.length > 1 ? "s" : ""}: ${negativeThemes
+            .slice(0, 2)
+            .map((t) => `${t.theme} (${t.count} mentions)`)
+            .join(", ")}.`
+        : ` Feedback is broadly positive across ${themes.length} extracted themes.`;
+
+    overallSummary = `${params.groupName} scored ${params.averages.overall.toFixed(
+      1
+    )}/5 across ${params.averages.count} responses.${dropNote}${themeNote}`;
+  }
 
   return {
     overallSummary,

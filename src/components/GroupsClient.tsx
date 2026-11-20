@@ -300,8 +300,10 @@ curl -X POST http://localhost:3000/api/v1/sync/students \\
       )}
 
       {/* Toggle Archived */}
-      <div className="flex items-center justify-between text-xs text-slate-500">
-        <span>Showing {visibleGroups.length} group(s)</span>
+      <div className="flex items-center justify-between text-xs font-semibold text-muted">
+        <span>
+          {t.groups.showing}: {visibleGroups.length}
+        </span>
         <label className="inline-flex items-center gap-1.5 cursor-pointer select-none">
           <input
             type="checkbox"
@@ -309,7 +311,7 @@ curl -X POST http://localhost:3000/api/v1/sync/students \\
             onChange={(e) => setShowArchived(e.target.checked)}
             className="rounded border-slate-300"
           />
-          Show archived cohorts
+          {t.groups.showArchived}
         </label>
       </div>
 
@@ -398,12 +400,12 @@ curl -X POST http://localhost:3000/api/v1/sync/students \\
                   >
                     <input
                       type="text"
-                      placeholder="Student full name"
+                      placeholder={t.groups.studentName}
                       value={studentForm.name}
                       onChange={(e) =>
                         setStudentForm({ ...studentForm, name: e.target.value })
                       }
-                      className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm"
+                      className="flex-1 rounded-xl pulse-input px-3 py-1.5 text-sm"
                       required
                     />
                     <input
@@ -413,24 +415,22 @@ curl -X POST http://localhost:3000/api/v1/sync/students \\
                       onChange={(e) =>
                         setStudentForm({ ...studentForm, email: e.target.value })
                       }
-                      className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm"
+                      className="flex-1 rounded-xl pulse-input px-3 py-1.5 text-sm"
                       required
                     />
                     <button
                       type="submit"
                       disabled={addingStudent}
-                      className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-medium hover:bg-indigo-700 disabled:opacity-60 cursor-pointer"
+                      className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#e000df] hover:bg-[#c400c3] text-white text-xs font-extrabold disabled:opacity-60 cursor-pointer"
                     >
                       <UserPlus className="w-3.5 h-3.5" />
-                      Add Student
+                      {t.groups.addStudent}
                     </button>
                   </form>
 
                   {/* Roster Table */}
                   {g.students.length === 0 ? (
-                    <p className="text-xs text-slate-400">
-                      No students in this group yet. Add one above or use CSV Import.
-                    </p>
+                    <p className="text-xs text-muted">{t.groups.noStudents}</p>
                   ) : (
                     <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-100">
                       {g.students.map((st) => (
