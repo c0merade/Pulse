@@ -66,6 +66,7 @@ export function SurveysClient({
     closesAt: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
   });
   const [templateId, setTemplateId] = useState("standard");
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [customQuestions, setCustomQuestions] = useState<CustomQuestion[]>([]);
   const [newQuestionLabel, setNewQuestionLabel] = useState("");
   const [newQuestionType, setNewQuestionType] = useState<"RATING" | "TEXT">("RATING");
@@ -413,7 +414,24 @@ export function SurveysClient({
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-slate-200 dark:border-white/[0.08] space-y-2.5">
+              <div className="pt-2 border-t border-[var(--border)]">
+                <button
+                  type="button"
+                  onClick={() => setShowAdvanced((v) => !v)}
+                  className="text-xs font-extrabold text-cyan-accent hover:underline cursor-pointer"
+                >
+                  {showAdvanced
+                    ? lang === "hy"
+                      ? "− Թաքցնել լրացուցիչ հարցերը"
+                      : "− Hide custom questions"
+                    : lang === "hy"
+                      ? "+ Ավելացնել շաբլոն կամ հավելյալ հարցեր (ըստ ցանկության)"
+                      : "+ Add template or custom questions (optional)"}
+                </button>
+              </div>
+
+              {showAdvanced && (
+              <div className="space-y-2.5">
                 <div>
                   <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">
                     {t.surveys.template}
@@ -487,6 +505,7 @@ export function SurveysClient({
                   </button>
                 </div>
               </div>
+              )}
 
               <div className="pt-2 flex justify-end gap-2">
                 <button
