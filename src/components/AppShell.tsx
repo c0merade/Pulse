@@ -111,7 +111,7 @@ export function AppShell({
     <div className="min-h-screen flex flex-col bg-[var(--background)] text-[var(--foreground)] transition-colors duration-200">
       {/* Apple-style Translucent Sticky Top Bar */}
       <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--surface)]/85 backdrop-blur-xl print:hidden">
-        <div className="max-w-5xl mx-auto px-5 h-16 flex items-center justify-between gap-4">
+        <div className="max-w-[1440px] mx-auto px-6 lg:px-10 h-16 flex items-center justify-between gap-4">
           {/* Brand */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0">
             <PulseLogo className="w-8 h-8" />
@@ -260,8 +260,8 @@ export function AppShell({
         </div>
       </header>
 
-      {/* Editorial Centered Canvas */}
-      <main className="flex-1 w-full max-w-5xl mx-auto px-5 md:px-8 py-8 md:py-12">
+      {/* Editorial Wide Canvas */}
+      <main className="flex-1 w-full max-w-[1440px] mx-auto px-6 lg:px-10 py-8 md:py-10">
         {children}
       </main>
     </div>
