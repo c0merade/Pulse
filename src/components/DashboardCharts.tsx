@@ -64,8 +64,9 @@ export function TrendLineChart({
             tick={{ fontSize: 12, fill: "#94a3b8", fontWeight: 600 }}
           />
           <Tooltip
+            cursor={{ stroke: "rgba(0, 240, 216, 0.45)", strokeWidth: 1.5 }}
             contentStyle={{
-              backgroundColor: "#16191e",
+              backgroundColor: "#121722",
               borderRadius: "12px",
               border: "1px solid rgba(0,229,204,0.35)",
               color: "#f8fafc",
@@ -166,8 +167,9 @@ export function ComparisonBarChart({
             tick={{ fontSize: 12, fill: "#94a3b8", fontWeight: 600 }}
           />
           <Tooltip
+            cursor={{ fill: "rgba(0, 240, 216, 0.08)" }}
             contentStyle={{
-              backgroundColor: "#16191e",
+              backgroundColor: "#121722",
               borderRadius: "12px",
               border: "1px solid rgba(0,229,204,0.35)",
               color: "#f8fafc",
