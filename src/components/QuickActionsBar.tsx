@@ -46,7 +46,7 @@ export function QuickActionsBar({
       <div className="flex flex-wrap items-center gap-3">
         <Link
           href="/surveys"
-          className="inline-flex items-center gap-2 py-2.5 px-5 rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-sm font-semibold transition-all shadow-sm"
+          className="inline-flex items-center gap-2 py-2.5 px-5 rounded-full bg-[#d900d8] hover:bg-[#b800b7] text-white text-sm font-semibold transition-all shadow-sm"
         >
           <Plus className="w-4 h-4" />
           {isHy ? "Նոր հարցում" : "New Survey"}

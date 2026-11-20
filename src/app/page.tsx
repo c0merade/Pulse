@@ -302,10 +302,10 @@ export default async function DashboardPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <div className="w-full h-1.5 bg-[var(--surface-elevated)] rounded-full overflow-hidden">
+                    <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full ${
-                          targetMet ? "bg-emerald-500" : "bg-[var(--accent)]"
+                          targetMet ? "bg-emerald-500" : "bg-[#d900d8]"
                         }`}
                         style={{ width: `${rate}%` }}
                       />

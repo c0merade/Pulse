@@ -156,7 +156,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-sm font-semibold disabled:opacity-60 transition-all flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full py-3 rounded-full bg-[#d900d8] hover:bg-[#b800b7] text-white text-sm font-semibold disabled:opacity-60 transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             {loading ? t.login.submitting : t.login.submit}
             <ArrowRight className="w-4 h-4" />

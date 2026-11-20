@@ -220,7 +220,7 @@ export function AppShell({
                   title={`${user.name} · ${
                     t.roles[user.role as keyof typeof t.roles] ?? user.role
                   } (${aiMode === "GEMINI" ? "Gemini AI" : "AI Ready"})`}
-                  className="w-8 h-8 rounded-full bg-[var(--accent)] text-white text-xs font-bold flex items-center justify-center"
+                  className="w-8 h-8 rounded-full bg-[#d900d8] text-white text-xs font-bold flex items-center justify-center shadow-xs"
                 >
                   {initials}
                 </div>
