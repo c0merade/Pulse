@@ -392,7 +392,7 @@ curl -X POST http://localhost:3000/api/v1/sync/students \\
               </div>
 
               {isOpen && (
-                <div className="border-t border-slate-100 bg-slate-50/60 p-5 space-y-4">
+                <div className="border-t border-[var(--border)] bg-[var(--background)] p-5 space-y-4">
                   {/* Inline Add Student */}
                   <form
                     onSubmit={(e) => handleAddSingleStudent(e, g.id)}
@@ -405,7 +405,7 @@ curl -X POST http://localhost:3000/api/v1/sync/students \\
                       onChange={(e) =>
                         setStudentForm({ ...studentForm, name: e.target.value })
                       }
-                      className="flex-1 rounded-xl pulse-input px-3 py-1.5 text-sm"
+                      className="flex-1 rounded-xl pulse-input px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00e5cc]/40 focus:border-[#00e5cc]"
                       required
                     />
                     <input
@@ -415,13 +415,13 @@ curl -X POST http://localhost:3000/api/v1/sync/students \\
                       onChange={(e) =>
                         setStudentForm({ ...studentForm, email: e.target.value })
                       }
-                      className="flex-1 rounded-xl pulse-input px-3 py-1.5 text-sm"
+                      className="flex-1 rounded-xl pulse-input px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00e5cc]/40 focus:border-[#00e5cc]"
                       required
                     />
                     <button
                       type="submit"
                       disabled={addingStudent}
-                      className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#e000df] hover:bg-[#c400c3] text-white text-xs font-extrabold disabled:opacity-60 cursor-pointer"
+                      className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-[#e000df] hover:bg-[#c400c3] text-white text-xs font-extrabold shadow-[0_0_16px_rgba(224,0,223,0.3)] disabled:opacity-60 cursor-pointer"
                     >
                       <UserPlus className="w-3.5 h-3.5" />
                       {t.groups.addStudent}
@@ -432,24 +432,24 @@ curl -X POST http://localhost:3000/api/v1/sync/students \\
                   {g.students.length === 0 ? (
                     <p className="text-xs text-muted">{t.groups.noStudents}</p>
                   ) : (
-                    <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-100">
+                    <div className="bento-inner divide-y divide-slate-100 overflow-hidden">
                       {g.students.map((st) => (
                         <div
                           key={st.id}
-                          className="px-3.5 py-2 flex items-center justify-between text-sm"
+                          className="px-4 py-2.5 flex items-center justify-between text-sm hover:bg-[#00e5cc]/[0.07] transition-colors"
                         >
                           <div>
-                            <span className="font-medium text-slate-900">
+                            <span className="font-bold text-primary">
                               {st.name}
                             </span>
-                            <span className="text-xs text-slate-500 ml-2">
+                            <span className="text-xs font-medium text-cyan-accent/80 ml-2.5">
                               {st.email}
                             </span>
                           </div>
                           <button
                             onClick={() => handleRemoveStudent(g.id, st.id)}
                             title="Remove student"
-                            className="p-1 text-slate-400 hover:text-rose-600 cursor-pointer"
+                            className="p-1.5 rounded-lg text-muted hover:text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>

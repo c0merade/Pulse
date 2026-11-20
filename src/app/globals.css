@@ -18,17 +18,17 @@
 }
 
 html.dark {
-  --background: #0b0d10;
-  --surface: #15181e;
-  --surface-elevated: #1e222a;
+  --background: #0a0d14;
+  --surface: #121722;
+  --surface-elevated: #1a2130;
   --foreground: #f8fafc;
-  --muted: #9ca3af;
-  --border: rgba(255, 255, 255, 0.09);
+  --muted: #9aa7bd;
+  --border: rgba(148, 163, 184, 0.14);
   --accent-text: #00f0d8;
   --yellow-text: #ffe600;
-  --banner-warn-bg: #1d1b12;
+  --banner-warn-bg: #1e1b10;
   --banner-warn-border: rgba(255, 230, 0, 0.35);
-  --input-bg: #1d2129;
+  --input-bg: #171e2b;
 }
 
 @theme inline {
@@ -101,12 +101,20 @@ html.dark .text-slate-500 {
   color: #94a3b8 !important;
 }
 html.dark .bg-white {
-  background-color: #15181e !important;
+  background-color: #121722 !important;
 }
 html.dark .bg-slate-50,
 html.dark .bg-slate-100,
-html.dark .bg-slate-200 {
-  background-color: #1e222a !important;
+html.dark .bg-slate-200,
+html.dark .bg-slate-50\/60,
+html.dark .bg-slate-50\/70 {
+  background-color: #1a2130 !important;
+}
+html.dark .hover\:bg-slate-50\/70:hover,
+html.dark .hover\:bg-slate-50:hover,
+html.dark .hover\:bg-slate-100:hover,
+html.dark .hover\:bg-slate-200:hover {
+  background-color: rgba(0, 240, 216, 0.08) !important;
 }
 html.dark .border-slate-200,
 html.dark .border-slate-300,
