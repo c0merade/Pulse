@@ -219,23 +219,31 @@ export function MeetingBriefClient({
         </div>
 
         {/* KPI Strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-          <StatBox label={t.dashboard.kpiActive} value={String(data.stats.activeSurveys)} />
-          <StatBox label={t.dashboard.kpiTurnout} value={`${data.stats.avgTurnout}%`} />
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5">
+          <StatBox
+            label={t.dashboard.kpiActive}
+            value={String(data.stats.activeSurveys)}
+            accent="cyan"
+          />
+          <StatBox
+            label={t.dashboard.kpiTurnout}
+            value={`${data.stats.avgTurnout}%`}
+            accent="yellow"
+          />
           <StatBox
             label={t.dashboard.kpiDrops}
             value={String(data.stats.flaggedDrops)}
-            accent={data.stats.flaggedDrops > 0 ? "rose" : "emerald"}
+            accent={data.stats.flaggedDrops > 0 ? "rose" : "cyan"}
           />
           <StatBox
             label={`${t.dashboard.kpiOpen} / ${t.dashboard.kpiOverdue}`}
             value={`${data.stats.openIssues} / ${data.stats.overdueIssues}`}
-            accent={data.stats.overdueIssues > 0 ? "rose" : "slate"}
+            accent={data.stats.overdueIssues > 0 ? "magenta" : "slate"}
           />
           <StatBox
             label={t.dashboard.kpiVerified}
             value={String(data.stats.verifiedIssues)}
-            accent="emerald"
+            accent="cyan"
           />
         </div>
 
@@ -375,18 +383,41 @@ function StatBox({
 }: {
   label: string;
   value: string;
-  accent?: "slate" | "rose" | "emerald";
+  accent?: "slate" | "rose" | "cyan" | "yellow" | "magenta";
 }) {
-  const color =
-    accent === "rose"
-      ? "text-rose-600"
-      : accent === "emerald"
-        ? "text-emerald-600"
-        : "text-slate-900";
+  const styles: Record<string, { bar: string; val: string }> = {
+    cyan: {
+      bar: "bg-[#00f0d8]",
+      val: "text-cyan-accent",
+    },
+    yellow: {
+      bar: "bg-[#ffe600]",
+      val: "text-yellow-accent",
+    },
+    magenta: {
+      bar: "bg-[#e000df]",
+      val: "text-[#e000df]",
+    },
+    rose: {
+      bar: "bg-rose-500",
+      val: "text-rose-500",
+    },
+    slate: {
+      bar: "bg-slate-400",
+      val: "text-primary",
+    },
+  };
+  const s = styles[accent] ?? styles.slate;
+
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3">
-      <div className="text-[11px] text-slate-500 font-medium">{label}</div>
-      <div className={`text-xl font-bold mt-0.5 ${color}`}>{value}</div>
+    <div className="bento-inner p-4 relative overflow-hidden flex flex-col justify-between gap-2 hover:border-[#00e5cc]/40 transition-colors">
+      <span className={`absolute top-0 left-0 right-0 h-0.5 ${s.bar} opacity-85`} />
+      <div className="text-[11px] font-bold uppercase tracking-wider text-muted leading-snug">
+        {label}
+      </div>
+      <div className={`text-2xl font-extrabold tracking-tight ${s.val}`}>
+        {value}
+      </div>
     </div>
   );
 }
