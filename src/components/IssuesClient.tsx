@@ -238,28 +238,61 @@ export function IssuesClient({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
-                  <select
-                    value={issue.status}
-                    onChange={(e) => handleStatusChange(issue.id, e.target.value)}
-                    className={`rounded-xl border px-3 py-1.5 text-xs font-extrabold cursor-pointer ${
-                      issue.status === "VERIFIED"
-                        ? "bg-[#00e5cc]/20 border-[#00e5cc]/50 text-teal-900 dark:text-[#00f0d8]"
-                        : issue.status === "RESOLVED"
-                          ? "bg-sky-500/15 border-sky-500/40 text-sky-800 dark:text-sky-300"
-                          : issue.status === "IN_PROGRESS"
-                            ? "bg-[#ffe600]/25 border-[#ffe600]/50 text-amber-900 dark:text-[#ffe600]"
-                            : "bg-rose-500/15 border-rose-500/40 text-rose-700 dark:text-rose-400"
-                    }`}
-                  >
-                    <option value="OPEN">{t.status.OPEN}</option>
-                    <option value="IN_PROGRESS">{t.status.IN_PROGRESS}</option>
-                    <option value="RESOLVED">{t.status.RESOLVED}</option>
-                    <option value="VERIFIED">{t.status.VERIFIED}</option>
-                  </select>
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  <div className="inline-flex items-center rounded-xl bg-[var(--background)] border border-[var(--border)] p-1 gap-1">
+                    {(
+                      [
+                        {
+                          key: "OPEN",
+                          dot: "bg-rose-500",
+                          active:
+                            "bg-rose-500/20 text-rose-500 border-rose-500/40 shadow-[0_0_12px_rgba(244,63,94,0.2)]",
+                        },
+                        {
+                          key: "IN_PROGRESS",
+                          dot: "bg-[#ffe600]",
+                          active:
+                            "bg-[#ffe600]/20 text-yellow-accent border-[#ffe600]/45 shadow-[0_0_12px_rgba(255,230,0,0.2)]",
+                        },
+                        {
+                          key: "RESOLVED",
+                          dot: "bg-sky-400",
+                          active:
+                            "bg-sky-500/20 text-sky-400 border-sky-400/45 shadow-[0_0_12px_rgba(56,189,248,0.2)]",
+                        },
+                        {
+                          key: "VERIFIED",
+                          dot: "bg-[#00f0d8]",
+                          active:
+                            "bg-[#00e5cc]/20 text-cyan-accent border-[#00f0d8]/45 shadow-[0_0_12px_rgba(0,240,216,0.22)]",
+                        },
+                      ] as const
+                    ).map((opt) => {
+                      const isActive = issue.status === opt.key;
+                      return (
+                        <button
+                          key={opt.key}
+                          type="button"
+                          onClick={() => handleStatusChange(issue.id, opt.key)}
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-extrabold border transition-all cursor-pointer ${
+                            isActive
+                              ? opt.active
+                              : "border-transparent text-muted hover:text-primary hover:bg-[var(--surface-elevated)]"
+                          }`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${opt.dot} ${
+                              isActive ? "opacity-100" : "opacity-40"
+                            }`}
+                          />
+                          {t.status[opt.key]}
+                        </button>
+                      );
+                    })}
+                  </div>
                   <button
                     onClick={() => handleDelete(issue.id)}
-                    className="p-2 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                    className="p-2 rounded-xl text-muted hover:text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

@@ -182,3 +182,8 @@ html.dark .bg-\[\#ffe600\] {
 html.dark .bg-\[\#e000df\] {
   color: #ffffff !important;
 }
+html.dark select,
+html.dark option {
+  background-color: #121722;
+  color: #f8fafc;
+}
