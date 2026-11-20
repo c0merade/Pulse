@@ -100,10 +100,10 @@ export function AppShell({
       <Link
         key={item.href}
         href={item.href}
-        className={`flex items-center justify-between gap-3 px-4 py-3 rounded-2xl text-[14px] font-medium transition-all ${
+        className={`flex items-center justify-between gap-3 px-4 py-3 rounded-2xl text-[14px] transition-all ${
           active
-            ? "bg-[#111113] text-white dark:bg-white dark:text-[#111113] font-semibold shadow-xs"
-            : "text-[#1d1d1f] dark:text-[#e5e5ea] hover:bg-[#f2f2f5] dark:hover:bg-white/[0.06]"
+            ? "nav-pill-active font-semibold shadow-xs"
+            : "nav-pill font-medium"
         }`}
       >
         <span className="flex items-center gap-3.5 min-w-0">
@@ -160,7 +160,7 @@ export function AppShell({
           <button
             type="button"
             onClick={() => switchLang(lang === "hy" ? "en" : "hy")}
-            className="w-full flex items-center justify-between px-4 py-2.5 rounded-2xl text-[14px] font-medium text-[#1d1d1f] dark:text-[#e5e5ea] hover:bg-[#f2f2f5] dark:hover:bg-white/[0.06] transition-colors cursor-pointer"
+            className="w-full flex items-center justify-between px-4 py-2.5 rounded-2xl text-[14px] font-medium nav-pill transition-colors cursor-pointer"
           >
             <span className="flex items-center gap-3.5">
               <Globe className="w-[18px] h-[18px] stroke-[1.75]" />
@@ -174,7 +174,7 @@ export function AppShell({
           <button
             type="button"
             onClick={toggleTheme}
-            className="w-full flex items-center justify-between px-4 py-2.5 rounded-2xl text-[14px] font-medium text-[#1d1d1f] dark:text-[#e5e5ea] hover:bg-[#f2f2f5] dark:hover:bg-white/[0.06] transition-colors cursor-pointer"
+            className="w-full flex items-center justify-between px-4 py-2.5 rounded-2xl text-[14px] font-medium nav-pill transition-colors cursor-pointer"
           >
             <span className="flex items-center gap-3.5">
               {theme === "dark" ? (
