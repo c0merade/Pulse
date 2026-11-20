@@ -5,12 +5,17 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
+  ArrowUpRight,
   Bell,
   Check,
   CheckCircle2,
   ExternalLink,
+  FileText,
   Plus,
   Sparkles,
+  TrendingDown,
+  TrendingUp,
+  Users,
   X,
 } from "lucide-react";
 import type { DropFlag, ScoreAverages, ThemeCluster } from "@/lib/analytics";
@@ -61,10 +66,12 @@ export function InboxWorkspaceClient({
   cohorts,
   lang = "hy",
   canManage = true,
+  userName = "",
 }: {
   cohorts: InboxCohortItem[];
   lang?: Lang;
   canManage?: boolean;
+  userName?: string;
 }) {
   const router = useRouter();
   const isHy = lang === "hy";
@@ -77,6 +84,31 @@ export function InboxWorkspaceClient({
 
   const selected = cohorts.find((c) => c.groupId === selectedId) ?? cohorts[0] ?? null;
   const survey = selected?.latestSurvey ?? null;
+
+  // Quick academy-wide stats for the Hero banner
+  const scoresWithData = cohorts
+    .map((c) => c.latestSurvey?.averages.overall ?? 0)
+    .filter((v) => v > 0);
+  const academyAvg =
+    scoresWithData.length > 0
+      ? scoresWithData.reduce((a, b) => a + b, 0) / scoresWithData.length
+      : 0;
+  const avgTurnout =
+    cohorts.length > 0
+      ? Math.round(
+          cohorts.reduce((a, c) => a + (c.latestSurvey?.responseRate ?? 0), 0) /
+            cohorts.length
+        )
+      : 0;
+  const totalOpenIssues = cohorts.reduce(
+    (sum, c) =>
+      sum +
+      c.issues.filter((i) => i.status === "OPEN" || i.status === "IN_PROGRESS")
+        .length,
+    0
+  );
+
+  const firstName = userName ? userName.split(" ")[0] : "";
 
   async function handleRemind(surveyId: string) {
     setBusy("remind");
@@ -178,7 +210,90 @@ export function InboxWorkspaceClient({
     ).length ?? 0;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-5">
+    <div className="space-y-6">
+      {/* Sleek Hero Header Banner */}
+      <div className="bento-card p-6 md:p-7 relative overflow-hidden">
+        <div
+          className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full opacity-20 blur-3xl"
+          style={{
+            background: "radial-gradient(circle, #d900d8 0%, #00e5cc 70%, transparent 100%)",
+          }}
+        />
+
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-1.5">
+            <div className="inline-flex items-center gap-2 text-xs font-bold text-[#d900d8]">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              Picsart Academy · Pulse
+            </div>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-primary">
+              {isHy
+                ? firstName
+                  ? `Բարի գալուստ, ${firstName}`
+                  : "Ակադեմիայի որակի պատկերը"
+                : firstName
+                  ? `Welcome back, ${firstName}`
+                  : "Academy Quality Pulse"}
+            </h1>
+            <p className="text-sm text-muted">
+              {isHy
+                ? "Ընտրեք խումբը ձախից՝ միանգամից տեսնելու ամփոփումը, խնդիրներն ու մասնակցությունը։"
+                : "Select a cohort on the left to instantly review its AI summary, issues, and turnout."}
+            </p>
+          </div>
+
+          {/* Mini KPI Pills + Actions */}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-4 px-4 py-2.5 rounded-2xl bento-inner text-xs">
+              <div>
+                <div className="text-muted font-medium">
+                  {isHy ? "Միջին միավոր" : "Avg Score"}
+                </div>
+                <div className="text-base font-bold text-primary">
+                  {academyAvg > 0 ? academyAvg.toFixed(1) : "—"}
+                  <span className="text-[11px] text-muted font-normal">/5</span>
+                </div>
+              </div>
+              <div className="h-7 w-px bg-[var(--border)]" />
+              <div>
+                <div className="text-muted font-medium">
+                  {isHy ? "Մասնակցություն" : "Turnout"}
+                </div>
+                <div className="text-base font-bold text-primary">{avgTurnout}%</div>
+              </div>
+              <div className="h-7 w-px bg-[var(--border)]" />
+              <div>
+                <div className="text-muted font-medium">
+                  {isHy ? "Բաց խնդիր" : "Open"}
+                </div>
+                <div className="text-base font-bold text-primary">
+                  {totalOpenIssues}
+                </div>
+              </div>
+            </div>
+
+            {canManage && (
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/reports"
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bento-inner hover:border-[#d900d8] text-xs font-semibold text-primary transition-colors"
+                >
+                  <FileText className="w-3.5 h-3.5 text-muted" />
+                  {isHy ? "Ժողովի ամփոփագիր" : "Brief"}
+                </Link>
+                <Link
+                  href="/surveys"
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-[#d900d8] hover:bg-[#b800b7] text-white text-xs font-semibold shadow-sm transition-colors"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  {isHy ? "Նոր հարցում" : "New Survey"}
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       {toast && (
         <div className="bento-card px-5 py-3.5 text-sm font-semibold text-primary flex items-center justify-between gap-2 border-[#d900d8]/40">
           <span>{toast}</span>
@@ -188,32 +303,26 @@ export function InboxWorkspaceClient({
         </div>
       )}
 
-      {/* Clean 2-Column Layout */}
+      {/* Clean 2-Column Workspace */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* LEFT: Simple Group Picker */}
+        {/* LEFT: Tactile Group Cards */}
         <aside className="lg:col-span-4 space-y-3">
           <div className="flex items-center justify-between px-1">
-            <h1 className="text-lg font-bold text-primary">
-              {isHy ? "Խմբեր" : "Groups"}
-            </h1>
-            {canManage && (
-              <Link
-                href="/surveys"
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#d900d8] hover:bg-[#b800b7] text-white text-xs font-semibold"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                {isHy ? "Նոր հարցում" : "New Survey"}
-              </Link>
-            )}
+            <h2 className="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-1.5">
+              <Users className="w-3.5 h-3.5" />
+              {isHy ? `Խմբեր (${cohorts.length})` : `Groups (${cohorts.length})`}
+            </h2>
           </div>
 
-          <div className="space-y-2.5">
+          <div className="space-y-3">
             {cohorts.map((c) => {
               const isSelected = selected?.groupId === c.groupId;
               const hasAlert =
                 (c.latestSurvey?.drops.length ?? 0) > 0 ||
                 c.issues.some((i) => i.isOverdue);
               const score = c.latestSurvey?.averages.overall ?? 0;
+              const rate = c.latestSurvey?.responseRate ?? 0;
+              const targetMet = rate >= (c.latestSurvey?.targetResponseRate ?? 75);
 
               return (
                 <button
@@ -223,39 +332,60 @@ export function InboxWorkspaceClient({
                     setSelectedId(c.groupId);
                     setTab("summary");
                   }}
-                  className={`w-full text-left p-5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                  className={`w-full text-left p-5 rounded-3xl border transition-all cursor-pointer space-y-3.5 ${
                     isSelected
-                      ? "bg-[var(--surface)] border-[#d900d8] shadow-md"
-                      : "bg-[var(--surface)]/70 border-[var(--border)] hover:bg-[var(--surface)]"
+                      ? "bg-[var(--surface)] border-[#d900d8] shadow-[0_8px_28px_rgba(217,0,216,0.12)]"
+                      : "bg-[var(--surface)] border-[var(--border)] hover:border-[#d900d8]/40 opacity-90 hover:opacity-100"
                   }`}
                 >
-                  <div className="min-w-0">
-                    <div className="text-base font-bold text-primary">
-                      {c.groupName}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-base font-bold text-primary flex items-center gap-2">
+                        {c.groupName}
+                        {isSelected && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#d900d8]" />
+                        )}
+                      </div>
+                      <div className="text-xs text-muted mt-0.5 truncate">
+                        {c.lecturerName} · {c.courseName}
+                      </div>
                     </div>
-                    <div className="text-xs text-muted mt-0.5 truncate">
-                      {c.lecturerName}
-                    </div>
-                    <div className="mt-2">
-                      {hasAlert ? (
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-rose-600">
-                          <span className="w-2 h-2 rounded-full bg-rose-500" />
-                          {isHy ? "Ուշադրության կարիք ունի" : "Needs attention"}
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
-                          <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                          {isHy ? "Ամեն ինչ լավ է" : "All good"}
-                        </span>
-                      )}
+
+                    <div
+                      className={`px-3 py-1 rounded-2xl text-sm font-bold shrink-0 ${
+                        score >= 4.2
+                          ? "bg-emerald-500/12 text-emerald-600 dark:text-emerald-400"
+                          : "bg-amber-500/12 text-amber-700 dark:text-amber-400"
+                      }`}
+                    >
+                      {score > 0 ? score.toFixed(1) : "—"}
                     </div>
                   </div>
 
-                  <div className="text-right shrink-0">
-                    <div className="text-2xl font-bold text-primary">
-                      {score > 0 ? score.toFixed(1) : "—"}
+                  {/* Mini Turnout Bar + Status */}
+                  <div className="space-y-1.5">
+                    <div className="w-full h-1.5 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full ${
+                          targetMet ? "bg-emerald-500" : "bg-[#d900d8]"
+                        }`}
+                        style={{ width: `${rate}%` }}
+                      />
                     </div>
-                    <div className="text-[11px] text-muted">/ 5.0</div>
+                    <div className="flex items-center justify-between text-[11px] font-semibold">
+                      {hasAlert ? (
+                        <span className="inline-flex items-center gap-1 text-rose-600">
+                          <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                          {isHy ? "Ուշադրության կարիք ունի" : "Needs attention"}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-emerald-600">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          {isHy ? "Ամեն ինչ լավ է" : "All good"}
+                        </span>
+                      )}
+                      <span className="text-muted">{rate}%</span>
+                    </div>
                   </div>
                 </button>
               );
@@ -263,7 +393,7 @@ export function InboxWorkspaceClient({
           </div>
         </aside>
 
-        {/* RIGHT: One Calm Card With 3 Clear Tabs */}
+        {/* RIGHT: Focused Cohort Workspace Card */}
         <section className="lg:col-span-8">
           {!selected || !survey ? (
             <div className="bento-card p-12 text-center text-sm text-muted">
@@ -271,13 +401,18 @@ export function InboxWorkspaceClient({
             </div>
           ) : (
             <div className="bento-card overflow-hidden">
-              {/* Calm Header */}
+              {/* Header */}
               <div className="p-6 md:p-7 border-b border-[var(--border)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-primary">
-                    {selected.groupName}
-                  </h2>
-                  <p className="text-sm text-muted mt-0.5">
+                  <div className="flex items-center gap-2.5">
+                    <h2 className="text-2xl font-bold text-primary">
+                      {selected.groupName}
+                    </h2>
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bento-inner text-muted">
+                      {survey.title}
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted mt-1">
                     {selected.courseName} · {selected.lecturerName}
                   </p>
                 </div>
@@ -288,9 +423,9 @@ export function InboxWorkspaceClient({
                       type="button"
                       onClick={() => handleRemind(survey.id)}
                       disabled={busy !== null}
-                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#d900d8] hover:bg-[#b800b7] text-white text-sm font-semibold cursor-pointer disabled:opacity-60"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#d900d8] hover:bg-[#b800b7] text-white text-xs font-semibold cursor-pointer disabled:opacity-60 shadow-sm"
                     >
-                      <Bell className="w-4 h-4" />
+                      <Bell className="w-3.5 h-3.5" />
                       {busy === "remind"
                         ? isHy
                           ? "Ուղարկվում է..."
@@ -304,9 +439,9 @@ export function InboxWorkspaceClient({
                       type="button"
                       onClick={() => handleAnalyze(survey.id)}
                       disabled={busy !== null}
-                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#d900d8] hover:bg-[#b800b7] text-white text-sm font-semibold cursor-pointer disabled:opacity-60"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#d900d8] hover:bg-[#b800b7] text-white text-xs font-semibold cursor-pointer disabled:opacity-60 shadow-sm"
                     >
-                      <Sparkles className="w-4 h-4" />
+                      <Sparkles className="w-3.5 h-3.5" />
                       {busy === "analyze"
                         ? isHy
                           ? "Թարմացվում է..."
@@ -316,58 +451,68 @@ export function InboxWorkspaceClient({
                           : "Update AI Summary"}
                     </button>
                   )}
+
+                  <Link
+                    href={`/surveys/${survey.id}`}
+                    title={isHy ? "Ամբողջական էջ" : "Full page"}
+                    className="p-2.5 rounded-full bento-inner hover:border-[#d900d8] text-muted hover:text-primary transition-colors"
+                  >
+                    <ArrowUpRight className="w-4 h-4" />
+                  </Link>
                 </div>
               </div>
 
-              {/* 3 Simple Tabs */}
-              <div className="px-6 md:px-7 border-b border-[var(--border)] flex gap-6 text-sm font-semibold">
-                <button
-                  type="button"
-                  onClick={() => setTab("summary")}
-                  className={`py-3.5 border-b-2 transition-colors cursor-pointer ${
-                    tab === "summary"
-                      ? "border-[#d900d8] text-primary"
-                      : "border-transparent text-muted hover:text-primary"
-                  }`}
-                >
-                  {isHy ? "Ամփոփում" : "Summary"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTab("issues")}
-                  className={`py-3.5 border-b-2 transition-colors cursor-pointer ${
-                    tab === "issues"
-                      ? "border-[#d900d8] text-primary"
-                      : "border-transparent text-muted hover:text-primary"
-                  }`}
-                >
-                  {isHy ? "Խնդիրներ" : "Issues"}{" "}
-                  {openCount > 0 && (
-                    <span className="ml-1 px-2 py-0.5 rounded-full text-xs bg-rose-500/15 text-rose-600">
-                      {openCount}
-                    </span>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTab("turnout")}
-                  className={`py-3.5 border-b-2 transition-colors cursor-pointer ${
-                    tab === "turnout"
-                      ? "border-[#d900d8] text-primary"
-                      : "border-transparent text-muted hover:text-primary"
-                  }`}
-                >
-                  {isHy ? "Մասնակցություն" : "Turnout"} ({survey.respondedCount}/
-                  {survey.totalInvites})
-                </button>
+              {/* Pill Segmented Tabs */}
+              <div className="px-6 md:px-7 pt-5">
+                <div className="inline-flex rounded-2xl bento-inner p-1 gap-1 text-xs font-semibold">
+                  <button
+                    type="button"
+                    onClick={() => setTab("summary")}
+                    className={`px-4 py-2 rounded-xl transition-all cursor-pointer ${
+                      tab === "summary"
+                        ? "nav-pill-active shadow-xs"
+                        : "text-muted hover:text-primary"
+                    }`}
+                  >
+                    {isHy ? "Ամփոփում" : "Summary"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTab("issues")}
+                    className={`px-4 py-2 rounded-xl transition-all cursor-pointer inline-flex items-center gap-1.5 ${
+                      tab === "issues"
+                        ? "nav-pill-active shadow-xs"
+                        : "text-muted hover:text-primary"
+                    }`}
+                  >
+                    {isHy ? "Խնդիրներ" : "Issues"}
+                    {openCount > 0 && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500 text-white">
+                        {openCount}
+                      </span>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTab("turnout")}
+                    className={`px-4 py-2 rounded-xl transition-all cursor-pointer ${
+                      tab === "turnout"
+                        ? "nav-pill-active shadow-xs"
+                        : "text-muted hover:text-primary"
+                    }`}
+                  >
+                    {isHy ? "Մասնակցություն" : "Turnout"} ({survey.respondedCount}/
+                    {survey.totalInvites})
+                  </button>
+                </div>
               </div>
 
-              {/* Tab Content */}
+              {/* Tab Body */}
               <div className="p-6 md:p-7">
-                {/* TAB 1: SIMPLE SUMMARY */}
+                {/* TAB 1: SUMMARY */}
                 {tab === "summary" && (
                   <div className="space-y-6">
-                    {/* Drop alert if any */}
+                    {/* Drop Alert */}
                     {survey.drops.length > 0 && (
                       <div className="rounded-2xl bg-rose-500/10 border border-rose-500/25 p-4 flex items-center gap-3 text-sm font-semibold text-rose-700 dark:text-rose-300">
                         <AlertTriangle className="w-5 h-5 shrink-0" />
@@ -383,82 +528,117 @@ export function InboxWorkspaceClient({
                       </div>
                     )}
 
-                    {/* Plain AI Paragraph */}
-                    <div className="space-y-2">
-                      <div className="text-xs font-bold uppercase tracking-wider text-muted">
+                    {/* AI Summary Callout */}
+                    <div className="rounded-2xl p-5 bento-inner space-y-2">
+                      <div className="flex items-center gap-2 text-xs font-bold text-[#d900d8]">
+                        <Sparkles className="w-3.5 h-3.5" />
                         {isHy ? "Ի՞նչ են ասում ուսանողները" : "What students are saying"}
                       </div>
-                      <p className="text-base text-primary leading-relaxed">
+                      <p className="text-[15px] text-primary leading-relaxed font-medium">
                         {survey.analysis?.overallSummary ||
-                          (isHy
-                            ? "Դեռ ամփոփում չկա։"
-                            : "No summary available yet.")}
+                          (isHy ? "Դեռ ամփոփում չկա։" : "No summary yet.")}
                       </p>
                     </div>
 
-                    {/* 4 Simple Score Bars */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4 border-y border-[var(--border)]">
+                    {/* 4 Visual Score Mini-Cards with Progress Bars */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
                       {(
                         [
-                          { k: "lectures" as const, label: t.categories.LECTURES },
-                          { k: "practice" as const, label: t.categories.PRACTICE },
-                          { k: "materials" as const, label: t.categories.MATERIALS },
-                          { k: "organization" as const, label: t.categories.ORGANIZATION },
+                          { k: "lectures" as const, label: t.categories.LECTURES, color: "bg-[#d900d8]" },
+                          { k: "practice" as const, label: t.categories.PRACTICE, color: "bg-[#0071e3]" },
+                          { k: "materials" as const, label: t.categories.MATERIALS, color: "bg-emerald-500" },
+                          { k: "organization" as const, label: t.categories.ORGANIZATION, color: "bg-amber-500" },
                         ] as const
                       ).map((dim) => {
                         const score = survey.averages[dim.k];
                         const delta = survey.deltas[dim.k];
+                        const pct = Math.min(100, Math.round((score / 5) * 100));
+                        const isDrop = delta !== null && delta <= -0.4;
                         return (
-                          <div key={dim.k} className="space-y-1">
-                            <div className="text-xs text-muted">{dim.label}</div>
-                            <div className="flex items-baseline gap-2">
+                          <div
+                            key={dim.k}
+                            className={`rounded-2xl p-4 bento-inner space-y-2.5 ${
+                              isDrop ? "border-rose-500/40" : ""
+                            }`}
+                          >
+                            <div className="text-[11px] font-semibold text-muted truncate">
+                              {dim.label}
+                            </div>
+                            <div className="flex items-baseline justify-between">
                               <span className="text-2xl font-bold text-primary">
                                 {score > 0 ? score.toFixed(1) : "—"}
                               </span>
                               {delta !== null && delta !== 0 && (
                                 <span
-                                  className={`text-xs font-bold ${
+                                  className={`inline-flex items-center gap-0.5 text-[11px] font-bold ${
                                     delta < 0 ? "text-rose-600" : "text-emerald-600"
                                   }`}
                                 >
+                                  {delta < 0 ? (
+                                    <TrendingDown className="w-3 h-3" />
+                                  ) : (
+                                    <TrendingUp className="w-3 h-3" />
+                                  )}
                                   {delta > 0 ? `+${delta.toFixed(1)}` : delta.toFixed(1)}
                                 </span>
                               )}
+                            </div>
+                            <div className="w-full h-1.5 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full ${isDrop ? "bg-rose-500" : dim.color}`}
+                                style={{ width: `${pct}%` }}
+                              />
                             </div>
                           </div>
                         );
                       })}
                     </div>
 
-                    {/* Top Themes — Ultra Clean List */}
+                    {/* Top Themes */}
                     {survey.analysis && survey.analysis.themes.length > 0 && (
                       <div className="space-y-3">
                         <div className="text-xs font-bold uppercase tracking-wider text-muted">
                           {isHy ? "Հիմնական թեմաները" : "Main themes"}
                         </div>
-                        <div className="divide-y divide-[var(--border)]">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           {survey.analysis.themes.slice(0, 4).map((th, idx) => (
                             <div
                               key={idx}
-                              className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                              className="rounded-2xl p-4 bento-inner flex flex-col justify-between gap-3"
                             >
-                              <div className="space-y-0.5">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-sm font-bold text-primary">
-                                    {th.theme}
+                              <div className="space-y-1.5">
+                                <div className="flex items-center justify-between gap-2">
+                                  <span
+                                    className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
+                                      th.sentiment === "NEGATIVE"
+                                        ? "bg-rose-500/15 text-rose-600"
+                                        : th.sentiment === "POSITIVE"
+                                          ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                                          : "bg-slate-200 text-muted"
+                                    }`}
+                                  >
+                                    {th.count} {isHy ? "հոգի" : "mentions"}
                                   </span>
-                                  <span className="text-xs font-semibold text-muted">
-                                    · {th.count} {isHy ? "հոգի" : "mentions"}
+                                  <span className="text-[11px] text-muted font-medium">
+                                    {t.categories[
+                                      th.category as keyof typeof t.categories
+                                    ] ?? th.category}
                                   </span>
                                 </div>
-                                <p className="text-xs text-muted">{th.summary}</p>
+                                <div className="text-sm font-bold text-primary">
+                                  {th.theme}
+                                </div>
+                                <p className="text-xs text-muted leading-relaxed">
+                                  {th.summary}
+                                </p>
                               </div>
+
                               {canManage && th.sentiment === "NEGATIVE" && (
                                 <button
                                   type="button"
                                   onClick={() => handleAddIssue(selected, th)}
                                   disabled={busy !== null}
-                                  className="self-start sm:self-center shrink-0 px-3.5 py-1.5 rounded-full border border-[#d900d8]/40 text-xs font-semibold text-[#b800b7] dark:text-[#f066ef] hover:bg-[#d900d8]/10 cursor-pointer"
+                                  className="self-start px-3 py-1 rounded-full bg-[#d900d8]/10 text-[#b800b7] dark:text-[#f066ef] hover:bg-[#d900d8]/20 text-xs font-bold cursor-pointer transition-colors"
                                 >
                                   {isHy ? "+ Խնդիր սարքել" : "+ Track Issue"}
                                 </button>
@@ -471,11 +651,11 @@ export function InboxWorkspaceClient({
                   </div>
                 )}
 
-                {/* TAB 2: SIMPLE ISSUES CHECKLIST */}
+                {/* TAB 2: ISSUES */}
                 {tab === "issues" && (
                   <div className="space-y-3">
                     {selected.issues.length === 0 ? (
-                      <div className="py-8 text-center text-sm text-muted">
+                      <div className="py-10 text-center text-sm text-muted">
                         {isHy
                           ? "Այս խմբում բաց խնդիրներ չկան։"
                           : "No issues for this group."}
@@ -509,7 +689,7 @@ export function InboxWorkspaceClient({
                                     ? "bg-emerald-500 text-white"
                                     : isDone
                                       ? "bg-sky-500 text-white"
-                                      : "border-2 border-slate-300"
+                                      : "border-2 border-slate-400/50"
                                 }`}
                               >
                                 {isDone && <Check className="w-3 h-3 stroke-[3]" />}
@@ -556,20 +736,20 @@ export function InboxWorkspaceClient({
                   </div>
                 )}
 
-                {/* TAB 3: SIMPLE TURNOUT */}
+                {/* TAB 3: TURNOUT */}
                 {tab === "turnout" && (
                   <div className="space-y-6">
-                    <div className="space-y-2">
+                    <div className="rounded-2xl bento-inner p-6 space-y-3">
                       <div className="flex items-baseline justify-between">
-                        <span className="text-3xl font-bold text-primary">
+                        <span className="text-4xl font-bold text-primary">
                           {survey.responseRate}%
                         </span>
-                        <span className="text-sm text-muted">
+                        <span className="text-sm font-medium text-muted">
                           {survey.respondedCount} / {survey.totalInvites}{" "}
                           {isHy ? "ուսանող պատասխանել է" : "students responded"}
                         </span>
                       </div>
-                      <div className="w-full h-2.5 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
+                      <div className="w-full h-3 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
                         <div
                           className={`h-full rounded-full ${
                             survey.responseRate >= survey.targetResponseRate
@@ -592,7 +772,7 @@ export function InboxWorkspaceClient({
                           type="button"
                           onClick={() => handleRemind(survey.id)}
                           disabled={busy !== null}
-                          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#d900d8] hover:bg-[#b800b7] text-white text-sm font-semibold cursor-pointer disabled:opacity-60"
+                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#d900d8] hover:bg-[#b800b7] text-white text-sm font-semibold cursor-pointer disabled:opacity-60"
                         >
                           <Bell className="w-4 h-4" />
                           {isHy
@@ -604,18 +784,12 @@ export function InboxWorkspaceClient({
                         <Link
                           href={`/s/${survey.samplePendingToken}`}
                           target="_blank"
-                          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-[var(--border)] text-sm font-semibold text-primary hover:border-[#d900d8]"
+                          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bento-inner hover:border-[#d900d8] text-sm font-semibold text-primary"
                         >
-                          {isHy ? "Բացել ուսանողի հարցաթերթիկը" : "Open Student Form"}
+                          {isHy ? "Ուսանողի հարցաթերթիկ" : "Student Form"}
                           <ExternalLink className="w-3.5 h-3.5" />
                         </Link>
                       )}
-                      <Link
-                        href={`/surveys/${survey.id}`}
-                        className="text-sm font-semibold text-muted hover:text-primary ml-auto"
-                      >
-                        {isHy ? "Ամբողջական մանրամասներ →" : "Full details →"}
-                      </Link>
                     </div>
                   </div>
                 )}

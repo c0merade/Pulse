@@ -121,6 +121,7 @@ export default async function DashboardPage() {
         cohorts={cohorts}
         lang={lang}
         canManage={user.role !== "LECTURER"}
+        userName={user.name}
       />
     </AppShell>
   );
