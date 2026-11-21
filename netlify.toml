@@ -4,6 +4,9 @@
   publish = "public"
   command = "echo 'Pulse frontend served via Netlify CDN -> Render backend'"
 
+[build.environment]
+  NETLIFY_NEXT_PLUGIN_SKIP = "true"
+
 [[redirects]]
   from = "/*"
   to = "https://pulse-178f.onrender.com/:splat"
