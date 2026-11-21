@@ -182,7 +182,11 @@ async function main() {
     // Create invites for all students in the group
     for (let i = 0; i < params.group.students.length; i++) {
       const student = params.group.students[i];
-      const hasResponded = i < params.responses.length;
+      // Keep fe-w3-5 pending as the primary shareable demo survey link (7/10 responded)
+      const hasResponded =
+        params.tokenPrefix === "fe-w3"
+          ? i !== 4 && i < params.responses.length + 1
+          : i < params.responses.length;
       await prisma.surveyInvite.create({
         data: {
           surveyId: survey.id,
