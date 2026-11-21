@@ -212,7 +212,7 @@ export function InboxWorkspaceClient({
   return (
     <div className="space-y-6">
       {/* Sleek Hero Header Banner */}
-      <div className="bento-card p-6 md:p-7 relative overflow-hidden">
+      <div className="bento-card p-4 sm:p-6 md:p-7 relative overflow-hidden">
         <div
           className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full opacity-20 blur-3xl"
           style={{
@@ -220,13 +220,13 @@ export function InboxWorkspaceClient({
           }}
         />
 
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6">
           <div className="space-y-1.5">
             <div className="inline-flex items-center gap-2 text-xs font-bold text-[#d900d8]">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               Picsart Academy · Pulse
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-primary">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-primary">
               {isHy
                 ? firstName
                   ? `Բարի գալուստ, ${firstName}`
@@ -235,18 +235,18 @@ export function InboxWorkspaceClient({
                   ? `Welcome back, ${firstName}`
                   : "Academy Quality Pulse"}
             </h1>
-            <p className="text-sm text-muted">
+            <p className="text-xs sm:text-sm text-muted">
               {isHy
-                ? "Ընտրեք խումբը ձախից՝ միանգամից տեսնելու ամփոփումը, խնդիրներն ու մասնակցությունը։"
-                : "Select a cohort on the left to instantly review its AI summary, issues, and turnout."}
+                ? "Ընտրեք խումբը՝ միանգամից տեսնելու ամփոփումը, խնդիրներն ու մասնակցությունը։"
+                : "Select a cohort to instantly review its AI summary, issues, and turnout."}
             </p>
           </div>
 
           {/* Mini KPI Pills + Actions */}
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-4 px-4 py-2.5 rounded-2xl bento-inner text-xs">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 w-full lg:w-auto">
+            <div className="flex items-center justify-between sm:justify-start gap-3 sm:gap-4 px-3.5 sm:px-4 py-2.5 rounded-2xl bento-inner text-xs w-full sm:w-auto">
               <div>
-                <div className="text-muted font-medium">
+                <div className="text-muted font-medium text-[11px] sm:text-xs">
                   {isHy ? "Միջին միավոր" : "Avg Score"}
                 </div>
                 <div className="text-base font-bold text-primary">
@@ -256,14 +256,14 @@ export function InboxWorkspaceClient({
               </div>
               <div className="h-7 w-px bg-[var(--border)]" />
               <div>
-                <div className="text-muted font-medium">
+                <div className="text-muted font-medium text-[11px] sm:text-xs">
                   {isHy ? "Մասնակցություն" : "Turnout"}
                 </div>
                 <div className="text-base font-bold text-primary">{avgTurnout}%</div>
               </div>
               <div className="h-7 w-px bg-[var(--border)]" />
               <div>
-                <div className="text-muted font-medium">
+                <div className="text-muted font-medium text-[11px] sm:text-xs">
                   {isHy ? "Բաց խնդիր" : "Open"}
                 </div>
                 <div className="text-base font-bold text-primary">
@@ -273,20 +273,20 @@ export function InboxWorkspaceClient({
             </div>
 
             {canManage && (
-              <div className="flex items-center gap-2">
+              <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
                 <Link
                   href="/reports"
-                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bento-inner hover:border-[#d900d8] text-xs font-semibold text-primary transition-colors"
+                  className="inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2.5 rounded-full bento-inner hover:border-[#d900d8] text-xs font-semibold text-primary transition-colors whitespace-nowrap"
                 >
-                  <FileText className="w-3.5 h-3.5 text-muted" />
-                  {isHy ? "Ժողովի ամփոփագիր" : "Brief"}
+                  <FileText className="w-3.5 h-3.5 text-muted shrink-0" />
+                  <span className="truncate">{isHy ? "Ամփոփագիր" : "Brief"}</span>
                 </Link>
                 <Link
                   href="/surveys"
-                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-[#d900d8] hover:bg-[#b800b7] text-white text-xs font-semibold shadow-sm transition-colors"
+                  className="inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2.5 rounded-full bg-[#d900d8] hover:bg-[#b800b7] text-white text-xs font-semibold shadow-sm transition-colors whitespace-nowrap"
                 >
-                  <Plus className="w-3.5 h-3.5" />
-                  {isHy ? "Նոր հարցում" : "New Survey"}
+                  <Plus className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">{isHy ? "Նոր հարցում" : "New Survey"}</span>
                 </Link>
               </div>
             )}
@@ -314,7 +314,7 @@ export function InboxWorkspaceClient({
             </h2>
           </div>
 
-          <div className="space-y-3">
+          <div className="flex lg:flex-col gap-3 overflow-x-auto pb-1 lg:pb-0 snap-x snap-mandatory no-scrollbar -mx-1 px-1">
             {cohorts.map((c) => {
               const isSelected = selected?.groupId === c.groupId;
               const hasAlert =
@@ -332,7 +332,7 @@ export function InboxWorkspaceClient({
                     setSelectedId(c.groupId);
                     setTab("summary");
                   }}
-                  className={`w-full text-left p-5 rounded-3xl border transition-all cursor-pointer space-y-3.5 ${
+                  className={`min-w-[250px] sm:min-w-[270px] lg:min-w-0 lg:w-full shrink-0 snap-start text-left p-4 sm:p-5 rounded-3xl border transition-all cursor-pointer space-y-3 ${
                     isSelected
                       ? "bg-[var(--surface)] border-[#d900d8] shadow-[0_8px_28px_rgba(217,0,216,0.12)]"
                       : "bg-[var(--surface)] border-[var(--border)] hover:border-[#d900d8]/40 opacity-90 hover:opacity-100"
@@ -402,22 +402,22 @@ export function InboxWorkspaceClient({
           ) : (
             <div className="bento-card overflow-hidden">
               {/* Header */}
-              <div className="p-6 md:p-7 border-b border-[var(--border)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="p-4 sm:p-6 md:p-7 border-b border-[var(--border)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                 <div>
-                  <div className="flex items-center gap-2.5">
-                    <h2 className="text-2xl font-bold text-primary">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-xl sm:text-2xl font-bold text-primary">
                       {selected.groupName}
                     </h2>
                     <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bento-inner text-muted">
                       {survey.title}
                     </span>
                   </div>
-                  <p className="text-sm text-muted mt-1">
+                  <p className="text-xs sm:text-sm text-muted mt-1">
                     {selected.courseName} · {selected.lecturerName}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   {canManage && survey.responseRate < survey.targetResponseRate ? (
                     <button
                       type="button"
@@ -463,12 +463,12 @@ export function InboxWorkspaceClient({
               </div>
 
               {/* Pill Segmented Tabs */}
-              <div className="px-6 md:px-7 pt-5">
-                <div className="inline-flex rounded-2xl bento-inner p-1 gap-1 text-xs font-semibold">
+              <div className="px-4 sm:px-6 md:px-7 pt-4 sm:pt-5 overflow-x-auto no-scrollbar">
+                <div className="inline-flex rounded-2xl bento-inner p-1 gap-1 text-xs font-semibold whitespace-nowrap">
                   <button
                     type="button"
                     onClick={() => setTab("summary")}
-                    className={`px-4 py-2 rounded-xl transition-all cursor-pointer ${
+                    className={`px-3.5 sm:px-4 py-2 rounded-xl transition-all cursor-pointer ${
                       tab === "summary"
                         ? "nav-pill-active shadow-xs"
                         : "text-muted hover:text-primary"
@@ -479,7 +479,7 @@ export function InboxWorkspaceClient({
                   <button
                     type="button"
                     onClick={() => setTab("issues")}
-                    className={`px-4 py-2 rounded-xl transition-all cursor-pointer inline-flex items-center gap-1.5 ${
+                    className={`px-3.5 sm:px-4 py-2 rounded-xl transition-all cursor-pointer inline-flex items-center gap-1.5 ${
                       tab === "issues"
                         ? "nav-pill-active shadow-xs"
                         : "text-muted hover:text-primary"
@@ -495,7 +495,7 @@ export function InboxWorkspaceClient({
                   <button
                     type="button"
                     onClick={() => setTab("turnout")}
-                    className={`px-4 py-2 rounded-xl transition-all cursor-pointer ${
+                    className={`px-3.5 sm:px-4 py-2 rounded-xl transition-all cursor-pointer ${
                       tab === "turnout"
                         ? "nav-pill-active shadow-xs"
                         : "text-muted hover:text-primary"
@@ -508,7 +508,7 @@ export function InboxWorkspaceClient({
               </div>
 
               {/* Tab Body */}
-              <div className="p-6 md:p-7">
+              <div className="p-4 sm:p-6 md:p-7">
                 {/* TAB 1: SUMMARY */}
                 {tab === "summary" && (
                   <div className="space-y-6">

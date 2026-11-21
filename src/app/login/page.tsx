@@ -75,20 +75,20 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col items-center justify-center p-6 transition-colors">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col items-center justify-center p-4 sm:p-6 transition-colors">
       {/* Top Minimal Controls */}
-      <div className="w-full max-w-md flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2.5">
-          <PulseLogo className="w-8 h-8" />
-          <span className="font-bold text-base tracking-tight text-primary">
+      <div className="w-full max-w-md flex items-center justify-between gap-2 mb-5 sm:mb-6">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <PulseLogo className="w-8 h-8 shrink-0" />
+          <span className="font-bold text-sm sm:text-base tracking-tight text-primary truncate">
             Pulse <span className="font-normal text-muted">· Picsart Academy</span>
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             type="button"
             onClick={() => switchLang(lang === "hy" ? "en" : "hy")}
-            className="px-2.5 py-1 rounded-full text-xs font-bold bg-[var(--surface)] border border-[var(--border)] text-primary cursor-pointer"
+            className="px-2.5 py-1.5 rounded-full text-xs font-bold bg-[var(--surface)] border border-[var(--border)] text-primary cursor-pointer"
           >
             {lang === "hy" ? "ՀԱՅ" : "EN"}
           </button>
@@ -103,12 +103,12 @@ export default function LoginPage() {
       </div>
 
       {/* Centered Editorial Sign-In Card */}
-      <div className="w-full max-w-md bento-card p-8 md:p-9 space-y-6">
+      <div className="w-full max-w-md bento-card p-5 sm:p-8 md:p-9 space-y-5 sm:space-y-6">
         <div className="space-y-1.5">
-          <h1 className="text-2xl font-bold tracking-tight text-primary">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-primary">
             {t.login.title}
           </h1>
-          <p className="text-sm text-muted">{t.login.subtitle}</p>
+          <p className="text-xs sm:text-sm text-muted">{t.login.subtitle}</p>
         </div>
 
         {error && (
@@ -132,7 +132,7 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl pulse-input px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:border-[var(--accent)]"
+              className="w-full rounded-xl pulse-input px-4 py-2.5 text-base sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:border-[var(--accent)]"
               required
             />
           </div>
@@ -146,17 +146,17 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-xl pulse-input px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:border-[var(--accent)]"
+                className="w-full rounded-xl pulse-input px-4 py-2.5 text-base sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:border-[var(--accent)]"
                 required
               />
-              <Lock className="w-4 h-4 text-muted absolute right-3.5 top-3" />
+              <Lock className="w-4 h-4 text-muted absolute right-3.5 top-3.5 sm:top-3" />
             </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-full bg-[#d900d8] hover:bg-[#b800b7] text-white text-sm font-semibold disabled:opacity-60 transition-all flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full min-h-[46px] py-3 rounded-full bg-[#d900d8] hover:bg-[#b800b7] text-white text-sm font-semibold disabled:opacity-60 transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
           >
             {loading ? t.login.submitting : t.login.submit}
             <ArrowRight className="w-4 h-4" />

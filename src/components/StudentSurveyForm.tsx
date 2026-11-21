@@ -83,17 +83,17 @@ export function StudentSurveyForm({
   }
 
   return (
-    <div className="min-h-screen bg-[#f3f6f8] dark:bg-[#0d0f12] flex items-center justify-center p-4 transition-colors">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] flex items-center justify-center p-3 sm:p-4 transition-colors">
       <div className="w-full max-w-xl bento-card shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="bg-[#111418] text-white px-6 py-6 flex items-start justify-between gap-3 border-b border-white/[0.08]">
-          <div>
+        <div className="bg-[#111418] text-white px-4 py-5 sm:px-6 sm:py-6 flex items-start justify-between gap-3 border-b border-white/[0.08]">
+          <div className="min-w-0">
             <div className="flex items-center gap-2 text-[#ffe600] text-xs font-extrabold uppercase tracking-wider mb-1.5">
               <PulseLogo className="w-5 h-5 shrink-0" />
               {t.badge}
             </div>
-            <h1 className="text-2xl font-extrabold">{survey.title}</h1>
-            <p className="text-sm text-slate-300 mt-1 font-medium">
+            <h1 className="text-xl sm:text-2xl font-extrabold">{survey.title}</h1>
+            <p className="text-xs sm:text-sm text-slate-300 mt-1 font-medium">
               {survey.groupName} · {survey.courseName} ({survey.lecturerName})
             </p>
           </div>
@@ -101,7 +101,7 @@ export function StudentSurveyForm({
             <button
               type="button"
               onClick={() => setLang("hy")}
-              className={`px-2.5 py-1 rounded-lg cursor-pointer ${
+              className={`px-2.5 py-1.5 rounded-lg cursor-pointer ${
                 lang === "hy" ? "bg-[#e000df] text-white" : "text-slate-300"
               }`}
             >
@@ -110,7 +110,7 @@ export function StudentSurveyForm({
             <button
               type="button"
               onClick={() => setLang("en")}
-              className={`px-2.5 py-1 rounded-lg cursor-pointer ${
+              className={`px-2.5 py-1.5 rounded-lg cursor-pointer ${
                 lang === "en" ? "bg-[#e000df] text-white" : "text-slate-300"
               }`}
             >
@@ -119,36 +119,36 @@ export function StudentSurveyForm({
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {submitted ? (
             <div className="py-8 text-center space-y-3">
               <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
-              <h2 className="text-xl font-bold text-slate-900">
+              <h2 className="text-xl font-bold text-primary">
                 {t.thankYou} {studentName}!
               </h2>
-              <p className="text-sm text-slate-600 max-w-md mx-auto">
+              <p className="text-sm text-muted max-w-md mx-auto">
                 {t.thankYouBody}
               </p>
             </div>
           ) : survey.status === "CLOSED" ? (
             <div className="py-8 text-center space-y-2">
-              <h2 className="text-lg font-semibold text-slate-900">
+              <h2 className="text-lg font-semibold text-primary">
                 {t.closedTitle}
               </h2>
-              <p className="text-sm text-slate-500">{t.closedBody}</p>
+              <p className="text-sm text-muted">{t.closedBody}</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="rounded-lg bg-slate-50 border border-slate-200 px-4 py-3 text-xs text-slate-600 flex items-start gap-2.5">
-                <Lock className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
+              <div className="rounded-xl bento-inner px-3.5 py-3 text-xs text-muted flex items-start gap-2.5">
+                <Lock className="w-4 h-4 text-[#d900d8] shrink-0 mt-0.5" />
                 <span>
-                  {t.anonNoticePrefix} <strong>{studentName}</strong>!{" "}
+                  {t.anonNoticePrefix} <strong className="text-primary">{studentName}</strong>!{" "}
                   {t.anonNoticeBody}
                 </span>
               </div>
 
               {error && (
-                <div className="rounded-lg bg-rose-50 border border-rose-200 px-4 py-2.5 text-sm text-rose-700">
+                <div className="rounded-xl bg-rose-500/10 border border-rose-500/30 px-4 py-2.5 text-sm text-rose-600 dark:text-rose-400">
                   {error}
                 </div>
               )}
@@ -156,13 +156,13 @@ export function StudentSurveyForm({
               <div className="space-y-5">
                 {questions.map((q) => (
                   <div key={q.key}>
-                    <div className="flex items-baseline justify-between mb-1.5">
-                      <label className="text-sm font-semibold text-slate-900">
+                    <div className="flex items-baseline justify-between gap-2 mb-1">
+                      <label className="text-sm font-semibold text-primary">
                         {q.label}
                       </label>
-                      <span className="text-xs text-slate-400">{t.scaleHint}</span>
+                      <span className="text-[11px] text-muted shrink-0">{t.scaleHint}</span>
                     </div>
-                    <p className="text-xs text-slate-500 mb-2">{q.hint}</p>
+                    <p className="text-xs text-muted mb-2.5">{q.hint}</p>
                     <div className="grid grid-cols-5 gap-2">
                       {[1, 2, 3, 4, 5].map((val) => {
                         const selected = scores[q.key] === val;
@@ -171,10 +171,10 @@ export function StudentSurveyForm({
                             key={val}
                             type="button"
                             onClick={() => setScores({ ...scores, [q.key]: val })}
-                            className={`py-2.5 rounded-xl border text-sm font-extrabold transition-all cursor-pointer ${
+                            className={`min-h-[48px] rounded-xl border text-base sm:text-sm font-extrabold transition-all active:scale-95 cursor-pointer ${
                               selected
                                 ? "bg-[#e000df] border-[#e000df] text-white shadow-[0_0_18px_rgba(224,0,223,0.4)]"
-                                : "bg-slate-50 dark:bg-[#1e2229] border-slate-200 dark:border-white/[0.1] text-slate-700 dark:text-slate-200 hover:border-[#e000df]"
+                                : "bento-inner text-primary hover:border-[#e000df]"
                             }`}
                           >
                             {val}
@@ -188,13 +188,13 @@ export function StudentSurveyForm({
 
               {/* Custom Template Questions */}
               {survey.customQuestions.length > 0 && (
-                <div className="pt-4 border-t border-slate-100 space-y-4">
-                  <div className="text-xs font-bold uppercase tracking-wider text-indigo-600">
+                <div className="pt-4 border-t border-[var(--border)] space-y-4">
+                  <div className="text-xs font-bold uppercase tracking-wider text-[#d900d8]">
                     {t.extraSection}
                   </div>
                   {survey.customQuestions.map((cq) => (
                     <div key={cq.id}>
-                      <label className="block text-sm font-semibold text-slate-900 mb-2">
+                      <label className="block text-sm font-semibold text-primary mb-2">
                         {cq.label}
                       </label>
                       {cq.type === "RATING" ? (
@@ -208,10 +208,10 @@ export function StudentSurveyForm({
                                 onClick={() =>
                                   setCustomAnswers({ ...customAnswers, [cq.id]: val })
                                 }
-                                className={`py-2 rounded-lg border text-sm font-semibold cursor-pointer ${
+                                className={`min-h-[44px] rounded-xl border text-base sm:text-sm font-semibold active:scale-95 transition-all cursor-pointer ${
                                   selected
-                                    ? "bg-indigo-600 border-indigo-600 text-white"
-                                    : "bg-white border-slate-200 text-slate-700 hover:border-indigo-300"
+                                    ? "bg-[#e000df] border-[#e000df] text-white"
+                                    : "bento-inner text-primary hover:border-[#e000df]"
                                 }`}
                               >
                                 {val}
@@ -229,7 +229,7 @@ export function StudentSurveyForm({
                               [cq.id]: e.target.value,
                             })
                           }
-                          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                          className="w-full rounded-xl pulse-input px-3.5 py-2.5 text-base sm:text-sm"
                         />
                       )}
                     </div>
@@ -238,23 +238,23 @@ export function StudentSurveyForm({
               )}
 
               <div>
-                <label className="block text-sm font-semibold text-slate-900 mb-1">
+                <label className="block text-sm font-semibold text-primary mb-1">
                   {t.commentLabel}
                 </label>
-                <p className="text-xs text-slate-500 mb-2">{t.commentHint}</p>
+                <p className="text-xs text-muted mb-2">{t.commentHint}</p>
                 <textarea
                   rows={4}
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   placeholder={t.commentPlaceholder}
-                  className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
+                  className="w-full rounded-xl pulse-input px-3.5 py-2.5 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#d900d8]/30 focus:border-[#d900d8]"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={submitting || !isComplete}
-                className="w-full py-3.5 rounded-xl bg-[#e000df] hover:bg-[#c400c3] text-white text-sm font-extrabold disabled:opacity-50 transition-all shadow-[0_0_22px_rgba(224,0,223,0.34)] cursor-pointer"
+                className="w-full min-h-[48px] py-3.5 rounded-xl bg-[#e000df] hover:bg-[#c400c3] text-white text-sm font-extrabold disabled:opacity-50 transition-all active:scale-[0.99] shadow-[0_0_22px_rgba(224,0,223,0.34)] cursor-pointer"
               >
                 {submitting ? t.submitting : t.submit}
               </button>
