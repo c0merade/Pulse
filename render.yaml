@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: pulse-picsart-academy
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        value: file:./dev.db
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: GEMINI_API_KEY
+        sync: false
