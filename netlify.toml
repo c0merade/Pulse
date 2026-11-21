@@ -1,9 +1,11 @@
+"$schema" = "https://open-api.netlify.com/netlify.schema.json"
+
 [build]
-  command = "npx prisma generate && npm run build"
-  publish = ".next"
+  publish = "public"
+  command = "echo 'Pulse frontend served via Netlify CDN -> Render backend'"
 
-[build.environment]
-  NODE_VERSION = "22"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
+[[redirects]]
+  from = "/*"
+  to = "https://pulse-178f.onrender.com/:splat"
+  status = 200
+  force = true
